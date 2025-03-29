@@ -1,5 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
 
 namespace ResumeSystem.Models.Database
 {
@@ -31,11 +34,23 @@ namespace ResumeSystem.Models.Database
 
         }
 
-        public static string ResumeToString()
+        public static string ResumeToString(string filePath)
         {
             //use  https://www.nuget.org/packages/documentformat.openxml to dump the resume to a string that should be lowercase.
-            return "";
-        }
+            using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(filePath, false))
+            {
+                var body = wordDoc.MainDocumentPart?.Document?.Body;
+                if (body == null) { return "--NO STRING FOUND--"; }
 
-    }
+                StringBuilder sb = new StringBuilder(1024);
+
+                foreach (var text in body.Descendants<Text>())
+                {
+                    sb.Append(text.Text).Append(' ');
+                }
+                
+                return sb.ToString().ToLower();
+            }
+        }
+	}
 }
