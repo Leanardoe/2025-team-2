@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Test Page";
 }
+@model QuerySearch
 
 <h1>
     This is a page for testing
@@ -8,3 +9,28 @@
 <h3>
     Change this page to test your changes and view data.
 </h3>
+<p1>
+
+    @{
+        QuerySearch search = new QuerySearch();
+
+        List<string> keywords = new List<string>() {"apple","grape" ,"meat"};
+
+        List<string> test = search.KeywordSearch(keywords);
+
+        List<string> r = search.KeywordSearch(keywords);
+
+        string W = "";
+
+        foreach(var word in r)
+
+        {
+            W += " " + word;
+        }
+        ViewBag.Fv = W;
+
+    }
+
+    <label> @ViewBag.FV.ToString() </label>
+
+</p1>

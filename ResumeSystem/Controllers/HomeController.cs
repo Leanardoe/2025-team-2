@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ResumeSystem.Models;
+
 
 namespace ResumeSystem.Controllers
 {
@@ -9,9 +11,23 @@ namespace ResumeSystem.Controllers
             return View();
         }
 
-        public IActionResult Test()
+        public IActionResult Test(QuerySearch model)
         {
-            return View();
+           
+            List<string> keywords = new List<string>() {"apple"};
+
+
+            if (ModelState.IsValid)
+            {
+                ViewBag.Fv = model.KeywordSearch(keywords);
+            }
+            else
+            {
+                ViewBag.Fv = "not working";
+            }
+
+
+                return View(model);
         }
     }
 }

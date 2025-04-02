@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using Ganss.Text;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using ResumeSystem.Models.Database;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,6 +7,8 @@ namespace ResumeSystem.Models
 {
     public class QuerySearch
     {
+        
+
         [Required]
         public int SearchID { get; set; }
         [Required]
@@ -19,13 +22,51 @@ namespace ResumeSystem.Models
         public void Filter()
         {
             //Returns a list of resumes that have the users specified skills and stores it in the private Resumes variable. May do filterAdd and filterRemove to save time.
+
         }
 
-        public List<Resume> KeywordSearch(List<string> keywords)
+        // list<resume>
+        public List<String> KeywordSearch(List<string> keywords)
         {
             var resumes = new List<Resume>();
+           
+            var strings = new List<string>();
+
+            //remove V 
+            resumes.Add(new Resume { RESUME_STRING = "eggs meaT pinapple grape grapefruit apple Meat" });
+            // test code ^
+
             //Takes a list of keywords and resumes (from filter) and returns a list of Resumes that are scored. This may help: https://stackoverflow.com/questions/687313/building-a-dictionary-of-counts-of-items-in-a-list
-            return resumes;
+            foreach (var resume in resumes)
+            {
+                var ac = new AhoCorasick(CharComparer.OrdinalIgnoreCase, keywords);
+                var results = ac.Search(resume.RESUME_STRING).ToList();
+
+                foreach (var word in results)
+                {
+                    strings.Add(word.Word);
+                }
+            }
+            return strings;
+        }
+
+        public Dictionary<string, int> skills(IList<string> reusumeslist)
+        {
+            Dictionary<string, int> skillcount = new Dictionary<string, int>();
+
+            foreach (string testlist in reusumeslist)
+            {
+
+                if (skillcount.ContainsKey(testlist))
+                {
+                    skillcount[testlist]++;
+                }
+                else
+                {
+                    skillcount.Add(testlist, 1);
+                }
+            }
+            return skillcount;
         }
     }
 }
