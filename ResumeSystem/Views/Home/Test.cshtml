@@ -2,9 +2,22 @@
     ViewData["Title"] = "Test Page";
 }
 
-<h1>
-    This is a page for testing
-</h1>
-<h3>
-    Change this page to test your changes and view data.
-</h3>
+<div class="container">
+    <h2>Resume Skill Extractor</h2>
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="resumeFile" class="form-label">Upload TXT Resume:</label>
+            <input type="file" class="form-control" id="resumeFile" name="resumeFile" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Submit to OpenAI</button>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(ViewBag.Result as string))
+    {
+        <div class="mt-4">
+            <h4>Detected Skills:</h4>
+            <pre>@ViewBag.Result</pre>
+        </div>
+    }
+
+</div>
