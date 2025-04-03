@@ -12,6 +12,7 @@
 <p1>
 
     @{
+        // am so sorry for the mess here
         QuerySearch search = new QuerySearch();
 
         List<string> keywords = new List<string>() {"apple","grape" ,"meat"};
@@ -21,16 +22,30 @@
         List<string> r = search.KeywordSearch(keywords);
 
         string W = "";
-
+        String M = "";
         foreach(var word in r)
 
         {
             W += " " + word;
         }
+
+        Dictionary<string, int> R2 = search.ScoreList(r);
+
+        foreach (var item in R2)
+        {
+            Console.WriteLine(
+             $"{item.Key}: {item.Value}"
+            );
+        }
+
+
+
         ViewBag.Fv = W;
+      
 
     }
 
     <label> @ViewBag.FV.ToString() </label>
+   
 
 </p1>

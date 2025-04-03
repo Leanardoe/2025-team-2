@@ -50,23 +50,16 @@ namespace ResumeSystem.Models
             return strings;
         }
 
-        public Dictionary<string, int> skills(IList<string> reusumeslist)
+        public Dictionary<string, int> ScoreList(IList<string> reusumeslist)
         {
-            Dictionary<string, int> skillcount = new Dictionary<string, int>();
-
-            foreach (string testlist in reusumeslist)
-            {
-
-                if (skillcount.ContainsKey(testlist))
-                {
-                    skillcount[testlist]++;
-                }
-                else
-                {
-                    skillcount.Add(testlist, 1);
-                }
-            }
-            return skillcount;
+            var groups = reusumeslist
+           //change .GroupBy(s => s) to .GroupBy(s => s.Word) when it time to use Resumes
+           .GroupBy(s => s)
+            .Select(s => new {
+            stuff = s.Key,
+            Count = s.Count()
+             });
+            return groups.ToDictionary(g => g.stuff, g => g.Count);
         }
     }
 }
