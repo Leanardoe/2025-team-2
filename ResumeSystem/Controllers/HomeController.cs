@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
+
 namespace ResumeSystem.Controllers
 {
     public class HomeController : Controller
