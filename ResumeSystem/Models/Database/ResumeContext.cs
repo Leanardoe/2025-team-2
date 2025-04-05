@@ -3,9 +3,9 @@ using ResumeSystem.Models.Database;
 
 namespace ResumeSystem.Models.Database
 {
-    public class ResumeDatabaseContext : DbContext
+    public class ResumeContext : DbContext
     {
-        public ResumeDatabaseContext(DbContextOptions<ResumeDatabaseContext> options) : base(options)
+        public ResumeContext(DbContextOptions<ResumeContext> options) : base(options)
         {
         }
 
@@ -13,5 +13,9 @@ namespace ResumeSystem.Models.Database
         public DbSet<Resume> Resumes { get; set; }
         public DbSet<Skill> Skills { get; set; }
         public DbSet<User> Users { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+        }
     }
 }
