@@ -1,0 +1,27 @@
+John Doe
+Software Developer
+Email: john.doe@example.com
+Phone: (555) 123-4567
+
+Summary:
+Experienced software developer with a passion for building scalable web applications and working with modern web technologies.
+
+Technical Skills:
+- C#
+- .NET Core
+- ASP.NET MVC
+- JavaScript
+- React
+- SQL Server
+- Entity Framework
+- Git
+- Azure
+
+Professional Experience:
+Software Developer at TechCorp (2020–Present)
+- Developed and maintained web applications using ASP.NET Core and Angular.
+- Improved application performance by 25% through optimization and caching strategies.
+- Collaborated with cross-functional teams in Agile environment.
+
+Education:
+B.S. in Computer Science, University of Technology, 2019

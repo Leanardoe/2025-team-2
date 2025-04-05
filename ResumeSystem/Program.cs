@@ -1,7 +1,16 @@
+using OpenAI;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<OpenAIClient>(_ =>
+{
+    var apiKey = builder.Configuration["OpenAI:ApiKey"];
+    return new OpenAIClient(apiKey);
+});
+
+
 
 var app = builder.Build();
 
