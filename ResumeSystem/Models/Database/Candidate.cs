@@ -7,7 +7,6 @@ namespace ResumeSystem.Models.Database
     {
         [Key]
         public int CandidateID { get; set; }
-        public int SkillID { get; set; }
 
         [Required(ErrorMessage = "A candidate must have a name.")]
         public string CAN_NAME { get; set; }

@@ -7,9 +7,6 @@ namespace ResumeSystem.Models.Database
         [Key]
         public int SkillID { get; set; }
 
-        [Required(ErrorMessage = "A candidate ID is required for a skill.")]
-        public int CandidateID { get; set; }
-
-        public Candidate Candidate { get; set; }
+        public string SKILL_NAME { get; set; } = string.Empty;
     }
 }
