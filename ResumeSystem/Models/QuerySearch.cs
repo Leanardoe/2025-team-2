@@ -44,9 +44,9 @@ namespace ResumeSystem.Models
 			return new List<WordMatch>();
 		}
 
-        public Dictionary<string, int> ScoreList(IList<WordMatch> reusumeslist)
+        public Dictionary<string, int> ScoreList(IList<WordMatch> resumeslist)
         {
-            var groups = reusumeslist
+            var groups = resumeslist
             .GroupBy(s => s.Word)
             .Select(s => new {
             stuff = s.Key,
