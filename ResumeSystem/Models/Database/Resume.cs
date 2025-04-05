@@ -19,8 +19,11 @@ namespace ResumeSystem.Models.Database
         [Required(ErrorMessage = "A resume URL is required.")]
         public string RESUME_URL { get; set; }
 
-        //ignore for database stuff for resume
-        [NotMapped]
+		[Required(ErrorMessage = "Resume content is required.")]
+		public string RESUME_STRING { get; set; }
+
+		//ignore for database stuff for resume
+		[NotMapped]
         public int Score { get; set; }
 
         //ignore for keyword search you will need to add your own constructor
