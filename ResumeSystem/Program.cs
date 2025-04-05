@@ -1,5 +1,8 @@
 using OpenAI;
 
+using Microsoft.EntityFrameworkCore;
+using ResumeSystem.Models.Database;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,6 +14,9 @@ builder.Services.AddSingleton<OpenAIClient>(_ =>
 });
 
 
+
+//Add EF Core DI
+builder.Services.AddDbContext<ResumeContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ResumeContext")));
 
 var app = builder.Build();
 
