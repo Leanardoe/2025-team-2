@@ -26,11 +26,9 @@ namespace ResumeSystem.Models
         }
 
         // list<resume>
-        public List<String> KeywordSearch(List<string> keywords)
+        public List<WordMatch> KeywordSearch(List<string> keywords)
         {
             var resumes = new List<Resume>();
-           
-            var strings = new List<string>();
 
             //remove V 
             resumes.Add(new Resume { RESUME_STRING = "eggs meaT pinapple grape grapefruit apple Meat" });
@@ -41,20 +39,15 @@ namespace ResumeSystem.Models
             {
                 var ac = new AhoCorasick(CharComparer.OrdinalIgnoreCase, keywords);
                 var results = ac.Search(resume.RESUME_STRING).ToList();
+				return results;
+			}
+			return new List<WordMatch>();
+		}
 
-                foreach (var word in results)
-                {
-                    strings.Add(word.Word);
-                }
-            }
-            return strings;
-        }
-
-        public Dictionary<string, int> ScoreList(IList<string> reusumeslist)
+        public Dictionary<string, int> ScoreList(IList<WordMatch> reusumeslist)
         {
             var groups = reusumeslist
-           //change .GroupBy(s => s) to .GroupBy(s => s.Word) when it time to use Resumes
-           .GroupBy(s => s)
+            .GroupBy(s => s.Word)
             .Select(s => new {
             stuff = s.Key,
             Count = s.Count()

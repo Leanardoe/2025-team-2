@@ -17,19 +17,7 @@
 
         List<string> keywords = new List<string>() {"apple","grape" ,"meat"};
 
-        List<string> test = search.KeywordSearch(keywords);
-
-        List<string> r = search.KeywordSearch(keywords);
-
-        string W = "";
-        String M = "";
-        foreach(var word in r)
-
-        {
-            W += " " + word;
-        }
-
-        Dictionary<string, int> R2 = search.ScoreList(r);
+        Dictionary<string, int> R2 = search.ScoreList(search.KeywordSearch(keywords));
 
         foreach (var item in R2)
         {
@@ -37,15 +25,5 @@
              $"{item.Key}: {item.Value}"
             );
         }
-
-
-
-        ViewBag.Fv = W;
-      
-
     }
-
-    <label> @ViewBag.FV.ToString() </label>
-   
-
 </p1>
