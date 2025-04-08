@@ -1,12 +1,26 @@
-﻿namespace ResumeSystem.Models
+﻿using ResumeSystem.Models.Database;
+
+namespace ResumeSystem.Models
 {
     public class FileUpload
     {
-        public static void ResumeUpload()
+        public static void ResumeUpload(string filePath, string AIData)
         {
-            //take a resume file path and create a new resume in the database. Process the Resume and create a Candidate using CreateCandidate in AIProcess.
-            //just change ot so it returns a resume for now while testing,
-            //once the whole database is done we can add the function of automatically putting the resume to the database
+            var resume = new Resume(filePath);
+
+            AIData = "{John Doe,email@email.com,555-808-5560}\nC#,Java,Programming,Python"; //remove this later
+
+
+        }
+
+        private static Candidate FindCandidate(string CandidateInfo)
+        {
+
+        }
+
+        private static IEnumerable<Skill> FindSkills(string SkillsInfo)
+        {
+
         }
     }
 }

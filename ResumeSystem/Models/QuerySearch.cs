@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office.CustomUI;
-using Ganss.Text;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using Ganss.Text;
 using ResumeSystem.Models.Database;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -27,47 +25,44 @@ namespace ResumeSystem.Models
         }
 
         // list<resume>
-        public List<WordMatch> KeywordSearch(List<string> keywords)
+        public List<Resume> KeywordSearch(List<string> keywords)
         {
-            var resumes = new List<Resume>();
+            Resumes = new List<Resume>();
+            var newResumes = new List<Resume>();
 
-            //remove V 
-            resumes.Add(new Resume { RESUME_STRING = "eggs meaT pinapple grape grapefruit apple Meat" });
-            // test code ^
-
-            //Takes a list of keywords and resumes (from filter) and returns a list of Resumes that are scored. This may help: https://stackoverflow.com/questions/687313/building-a-dictionary-of-counts-of-items-in-a-list
-            foreach (var resume in resumes)
+            foreach (var resume in Resumes)
             {
+                resume.Score = 0;
                 var ac = new AhoCorasick(CharComparer.OrdinalIgnoreCase, keywords);
                 var results = ac.Search(resume.RESUME_STRING).ToList();
 
-				return results;
+				resume.Score = ScoreList(results);
+                newResumes.Add(resume);
 			}
-			return new List<WordMatch>();
+            return newResumes;
 		}
 
-        public Dictionary<string, int> ScoreList(IList<WordMatch> resumeslist)
+        public int ScoreList(IList<WordMatch> resumeslist)
         {
+            int lengthStrength = 10;
             var groups = resumeslist
             .GroupBy(s => s.Word)
             .Select(s => new {
             stuff = s.Key,
             Count = s.Count()
              });
-            return groups.ToDictionary(g => g.stuff, g => g.Count);
+            return ScoreResume(groups.ToDictionary(g => g.stuff, g => g.Count),lengthStrength);
         }
 
-        public int scoreresume(Dictionary<string, int> scores, int mult) 
+        public int ScoreResume(Dictionary<string, int> scores, int mult) 
         {
-           
-            int legnth = scores.Keys.Count;
-            int score = legnth * mult;
-            foreach (var resmues in scores) {
-                score += resmues.Value;
+            int length = scores.Keys.Count;
+            int score = length * mult;
+            foreach (var resumes in scores) {
+                score += resumes.Value;
             }
 
             return score;
-
         }
     }
 }
