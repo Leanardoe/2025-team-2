@@ -1,4 +1,5 @@
-﻿using Ganss.Text;
+﻿using DocumentFormat.OpenXml.Office.CustomUI;
+using Ganss.Text;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using ResumeSystem.Models.Database;
 using System.ComponentModel.DataAnnotations;
@@ -39,6 +40,7 @@ namespace ResumeSystem.Models
             {
                 var ac = new AhoCorasick(CharComparer.OrdinalIgnoreCase, keywords);
                 var results = ac.Search(resume.RESUME_STRING).ToList();
+
 				return results;
 			}
 			return new List<WordMatch>();
@@ -53,6 +55,19 @@ namespace ResumeSystem.Models
             Count = s.Count()
              });
             return groups.ToDictionary(g => g.stuff, g => g.Count);
+        }
+
+        public int scoreresume(Dictionary<string, int> scores, int mult) 
+        {
+           
+            int legnth = scores.Keys.Count;
+            int score = legnth * mult;
+            foreach (var resmues in scores) {
+                score += resmues.Value;
+            }
+
+            return score;
+
         }
     }
 }
