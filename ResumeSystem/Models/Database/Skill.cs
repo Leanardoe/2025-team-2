@@ -7,6 +7,9 @@ namespace ResumeSystem.Models.Database
         [Key]
         public int SkillID { get; set; }
 
+        [Required]
         public string SKILL_NAME { get; set; } = string.Empty;
-    }
+
+		public ICollection<Candidate> Candidates { get; set; } = new List<Candidate>();
+	}
 }

@@ -17,7 +17,7 @@ namespace ResumeSystem.Models.Database
         [Phone(ErrorMessage = "The phone number is not valid.")]
         public string? CAN_PHONE { get; set; }
 
-        public ICollection<Resume> Resumes { get; set; }
-        public ICollection<Skill> Skills { get; set; }
+        public ICollection<Resume> Resumes { get; set; } = new List<Resume>();
+        public ICollection<Skill> Skills { get; set; } = new List<Skill>();
     }
 }

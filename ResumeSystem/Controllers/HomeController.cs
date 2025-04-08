@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OpenAI;
 using OpenAI.Chat;
+using ResumeSystem.Models;
+using ResumeSystem.Models.Database;
 using System.Text;
 
 namespace ResumeSystem.Controllers
@@ -9,9 +11,12 @@ namespace ResumeSystem.Controllers
     {
         private readonly OpenAIClient _client;
 
-        public HomeController(IConfiguration config)
+		private ResumeContext context;
+
+		public HomeController(IConfiguration config, ResumeContext ctx)
         {
-            var apiKey = config["OpenAI:ApiKey"];
+			context = ctx;
+			var apiKey = config["OpenAI:ApiKey"];
             _client = new OpenAIClient(apiKey);
         }
 
@@ -82,6 +87,10 @@ namespace ResumeSystem.Controllers
             {
                 ViewBag.Result = $"❌ Unexpected error: {ex.Message}";
             }
+
+            FileUpload fileUpload = new FileUpload(context);
+
+            fileUpload.ResumeUpload("wertyuisdfghjsdfgerty.", "...");
 
             return View();
         }

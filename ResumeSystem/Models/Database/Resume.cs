@@ -22,14 +22,11 @@ namespace ResumeSystem.Models.Database
 		[Required(ErrorMessage = "Resume content is required.")]
 		public string RESUME_STRING { get; set; }
 
+		//public ICollection<Candidate> Candidates { get; set; } = new List<Candidate>();
+
 		//ignore for database stuff for resume
 		[NotMapped]
         public int Score { get; set; }
-        public Resume(string filePath)
-        {
-            RESUME_STRING = ResumeToString(filePath);
-            RESUME_URL = filePath;
-        }
 
         public static string ResumeToString(string filePath)
         {
