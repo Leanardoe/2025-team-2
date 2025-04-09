@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ResumeSystem.Models.Database
 {
@@ -18,6 +17,6 @@ namespace ResumeSystem.Models.Database
         public string? CAN_PHONE { get; set; }
 
         public ICollection<Resume> Resumes { get; set; } = new List<Resume>();
-        public ICollection<Skill> Skills { get; set; } = new List<Skill>();
-    }
+		public ICollection<CandidateSkill> CandidateSkills { get; set; } = new List<CandidateSkill>();
+	}
 }

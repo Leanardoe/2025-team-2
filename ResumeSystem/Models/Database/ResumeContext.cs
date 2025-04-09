@@ -16,6 +16,18 @@ namespace ResumeSystem.Models.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-        }
+			modelBuilder.Entity<CandidateSkill>()
+		    .HasKey(cs => new { cs.CandidateID, cs.SkillID });
+
+			modelBuilder.Entity<CandidateSkill>()
+				.HasOne(cs => cs.Candidate)
+				.WithMany(c => c.CandidateSkills)
+				.HasForeignKey(cs => cs.CandidateID);
+
+			modelBuilder.Entity<CandidateSkill>()
+				.HasOne(cs => cs.Skill)
+				.WithMany(s => s.CandidateSkills)
+				.HasForeignKey(cs => cs.SkillID);
+		}
     }
 }

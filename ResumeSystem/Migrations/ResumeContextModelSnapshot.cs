@@ -21,21 +21,6 @@ namespace ResumeSystem.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CandidateSkill", b =>
-                {
-                    b.Property<int>("CandidatesCandidateID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SkillsSkillID")
-                        .HasColumnType("int");
-
-                    b.HasKey("CandidatesCandidateID", "SkillsSkillID");
-
-                    b.HasIndex("SkillsSkillID");
-
-                    b.ToTable("CandidateSkill");
-                });
-
             modelBuilder.Entity("ResumeSystem.Models.Database.Candidate", b =>
                 {
                     b.Property<int>("CandidateID")
@@ -57,6 +42,21 @@ namespace ResumeSystem.Migrations
                     b.HasKey("CandidateID");
 
                     b.ToTable("Candidates");
+                });
+
+            modelBuilder.Entity("ResumeSystem.Models.Database.CandidateSkill", b =>
+                {
+                    b.Property<int>("CandidateID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SkillID")
+                        .HasColumnType("int");
+
+                    b.HasKey("CandidateID", "SkillID");
+
+                    b.HasIndex("SkillID");
+
+                    b.ToTable("CandidateSkill");
                 });
 
             modelBuilder.Entity("ResumeSystem.Models.Database.Resume", b =>
@@ -115,19 +115,23 @@ namespace ResumeSystem.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CandidateSkill", b =>
+            modelBuilder.Entity("ResumeSystem.Models.Database.CandidateSkill", b =>
                 {
-                    b.HasOne("ResumeSystem.Models.Database.Candidate", null)
-                        .WithMany()
-                        .HasForeignKey("CandidatesCandidateID")
+                    b.HasOne("ResumeSystem.Models.Database.Candidate", "Candidate")
+                        .WithMany("CandidateSkills")
+                        .HasForeignKey("CandidateID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ResumeSystem.Models.Database.Skill", null)
-                        .WithMany()
-                        .HasForeignKey("SkillsSkillID")
+                    b.HasOne("ResumeSystem.Models.Database.Skill", "Skill")
+                        .WithMany("CandidateSkills")
+                        .HasForeignKey("SkillID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("Skill");
                 });
 
             modelBuilder.Entity("ResumeSystem.Models.Database.Resume", b =>
@@ -143,7 +147,14 @@ namespace ResumeSystem.Migrations
 
             modelBuilder.Entity("ResumeSystem.Models.Database.Candidate", b =>
                 {
+                    b.Navigation("CandidateSkills");
+
                     b.Navigation("Resumes");
+                });
+
+            modelBuilder.Entity("ResumeSystem.Models.Database.Skill", b =>
+                {
+                    b.Navigation("CandidateSkills");
                 });
 #pragma warning restore 612, 618
         }

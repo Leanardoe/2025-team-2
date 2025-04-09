@@ -75,30 +75,30 @@ namespace ResumeSystem.Migrations
                 name: "CandidateSkill",
                 columns: table => new
                 {
-                    CandidatesCandidateID = table.Column<int>(type: "int", nullable: false),
-                    SkillsSkillID = table.Column<int>(type: "int", nullable: false)
+                    CandidateID = table.Column<int>(type: "int", nullable: false),
+                    SkillID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CandidateSkill", x => new { x.CandidatesCandidateID, x.SkillsSkillID });
+                    table.PrimaryKey("PK_CandidateSkill", x => new { x.CandidateID, x.SkillID });
                     table.ForeignKey(
-                        name: "FK_CandidateSkill_Candidates_CandidatesCandidateID",
-                        column: x => x.CandidatesCandidateID,
+                        name: "FK_CandidateSkill_Candidates_CandidateID",
+                        column: x => x.CandidateID,
                         principalTable: "Candidates",
                         principalColumn: "CandidateID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CandidateSkill_Skills_SkillsSkillID",
-                        column: x => x.SkillsSkillID,
+                        name: "FK_CandidateSkill_Skills_SkillID",
+                        column: x => x.SkillID,
                         principalTable: "Skills",
                         principalColumn: "SkillID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CandidateSkill_SkillsSkillID",
+                name: "IX_CandidateSkill_SkillID",
                 table: "CandidateSkill",
-                column: "SkillsSkillID");
+                column: "SkillID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Resumes_CandidateID",

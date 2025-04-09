@@ -10,6 +10,6 @@ namespace ResumeSystem.Models.Database
         [Required]
         public string SKILL_NAME { get; set; } = string.Empty;
 
-		public ICollection<Candidate> Candidates { get; set; } = new List<Candidate>();
+		public ICollection<CandidateSkill> CandidateSkills { get; set; } = new List<CandidateSkill>();
 	}
 }
