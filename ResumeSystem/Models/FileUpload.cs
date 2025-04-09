@@ -21,7 +21,7 @@ namespace ResumeSystem.Models
 				RESUME_STRING = Resume.ResumeToString(filePath)
 			};
 
-			AIData = "{Phil Louis,gmail@gmail.com,555-808-9987}|C#,Java,Music,Singing,Jelly Sandwich,Hunting"; //remove this later
+			AIData = "{Huey Louis,Email@email.com,555-808-9987}|C#,Java,Music,Singing,Jelly Sandwich,Hunting,The News"; //remove this later
 
 			var split = AIData.Split('|');
 			Candidate candidate;
@@ -73,17 +73,81 @@ namespace ResumeSystem.Models
 			}
 		}
 
+        public void ResumeUpload(string filePath, string AIData, Candidate candidate)
+        {
+            var resume = new Resume
+            {
+                RESUME_URL = filePath,
+                RESUME_STRING = Resume.ResumeToString(filePath)
+            };
+
+            AIData = "{Huey Louis,Email@email.com,555-808-9987}|C#,Java,Music,Singing,Jelly Sandwich,Hunting,The News"; //remove this later
+
+            var split = AIData.Split('|');
+            List<Skill> skills;
+            if (split.Length > 1)
+            {
+                skills = FindSkills(split[1], candidate);
+
+                // Go through each skill and add only if it's not already present
+                foreach (var skill in skills)
+                {
+                    try
+                    {
+                        // Check if it's already in the candidate's skills
+                        var existingLink = _context.Set<CandidateSkill>()
+                        .FirstOrDefault(cs => cs.CandidateID == candidate.CandidateID && cs.SkillID == skill.SkillID);
+
+                        if (existingLink == null)
+                        {
+                            candidate.CandidateSkills.Add(new CandidateSkill
+                            {
+                                Candidate = candidate,
+                                Skill = skill
+                            });
+                        }
+                    }
+                    catch
+                    {
+                        Console.WriteLine($"Error adding skill {skill.SkillID} - {skill.SKILL_NAME}");
+                    }
+                }
+
+                // Add resume to the candidate's resume collection
+                candidate.Resumes.Add(resume);
+
+                // You only need to update the candidate once after modifying the skills and resumes
+                if (candidate.CandidateID != 0)
+                {
+                    _context.Candidates.Update(candidate);
+                }
+                else
+                {
+                    _context.Candidates.Add(candidate);
+                }
+
+                // Save all changes to the database at once
+                _context.SaveChanges();
+            }
+        }
+
         private Candidate FindCandidate(string CandidateInfo)
         {
 			Candidate candidate = new Candidate();
 
 			CandidateInfo = CandidateInfo.Replace("{", "").Replace("}", "").Trim();
+			var candidateInfo = CandidateInfo.Split(',');
 
-			foreach (var str in CandidateInfo.Split(','))
+            for (int i = 0; i < candidateInfo.Length; i++)
 			{
-				if (isPhone(str)) candidate.CAN_PHONE = str;
+				var str = candidateInfo[i].Trim();
+				if (i == 0)
+				{
+					candidate.CAN_NAME = str;
+					continue;
+				}
+				else if (isPhone(str)) candidate.CAN_PHONE = str;
 				else if (isEmail(str)) candidate.CAN_EMAIL = str;
-				else candidate.CAN_NAME = str;
 			}
 
 			int key = CandidateExists(candidate.CAN_NAME, candidate.CAN_EMAIL, candidate.CAN_PHONE);
@@ -133,7 +197,7 @@ namespace ResumeSystem.Models
 			return skillList;
 		}
 
-		private int CandidateExists(string name, string? email, string? phone)
+		public int CandidateExists(string name, string? email, string? phone)
 		{
 			var candidate = _context.Candidates.FirstOrDefault(c =>
 				c.CAN_NAME.ToLower() == name.ToLower() &&
