@@ -1,4 +1,5 @@
-﻿using ResumeSystem.Models.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using ResumeSystem.Models.Database;
 using System.Text.RegularExpressions;
 
 namespace ResumeSystem.Models
@@ -20,7 +21,7 @@ namespace ResumeSystem.Models
 				RESUME_STRING = Resume.ResumeToString(filePath)
 			};
 
-			AIData = "{John Louis,email@email.com,555-808-5560}|C#,Java,Programming,Jelly Sandwich"; //remove this later
+			AIData = "{Phil Louis,email@email.com,555-808-9987}|C#,Java,Music,Singing,The News"; //remove this later
 
 			var split = AIData.Split('|');
 			Candidate candidate;
@@ -28,19 +29,37 @@ namespace ResumeSystem.Models
 			if (split.Length > 1)
 			{
 				candidate = FindCandidate(split[0]);
-				skills = FindSkills(split[1]);
+				skills = FindSkills(split[1],candidate);
 
-				var uniqueSkills = skills
-					.Where(skill => !candidate.Skills.Any(c => c.SKILL_NAME == skill.SKILL_NAME))
-					.ToList();
-
-				foreach (var skill in uniqueSkills)
+				if (candidate.CandidateID != 0)
 				{
-					candidate.Skills.Add(skill);
+					candidate.Skills.Clear(); // Clear previous skills
 				}
 
+				// Go through each skill and add only if it's not already present
+				foreach (var skill in skills)
+				{
+					try
+					{
+						// Check if the skill is already associated with the candidate by SkillID or SKILL_NAME
+						var existingSkill = candidate.Skills.FirstOrDefault(s => s.SkillID == skill.SkillID || s.SKILL_NAME == skill.SKILL_NAME);
+
+						// If the skill is not already in the candidate's skills, add it
+						if (existingSkill == null)
+						{
+							candidate.Skills.Add(skill);
+						}
+					}
+					catch
+					{
+						Console.WriteLine(skill.SkillID);
+					}
+				}
+
+				// Add resume to the candidate's resume collection
 				candidate.Resumes.Add(resume);
 
+				// You only need to update the candidate once after modifying the skills and resumes
 				if (candidate.CandidateID != 0)
 				{
 					_context.Candidates.Update(candidate);
@@ -50,7 +69,7 @@ namespace ResumeSystem.Models
 					_context.Candidates.Add(candidate);
 				}
 
-				//save
+				// Save all changes to the database at once
 				_context.SaveChanges();
 			}
 		}
@@ -72,7 +91,7 @@ namespace ResumeSystem.Models
 
 			if (key == -1)
 			{
-				_context.Candidates.Add(candidate);
+				//_context.Candidates.Add(candidate);
 				//await _context.SaveChangesAsync(); //We can save in the resumeUpload function
 			}
 			else
@@ -89,7 +108,7 @@ namespace ResumeSystem.Models
 			return candidate;
 		}
 
-		private List<Skill> FindSkills(string SkillsInfo)
+		private List<Skill> FindSkills(string SkillsInfo, Candidate candidate)
 		{
 			var stringList = SkillsInfo.Split(',').Distinct().Select(str => str.Trim());
 
@@ -97,10 +116,37 @@ namespace ResumeSystem.Models
 
 			foreach (var skillName in stringList)
 			{
-				var newSkill = new Skill { SKILL_NAME = skillName };
-				skillList.Add(newSkill);	
+				var existingSkill = _context.Skills
+					.FirstOrDefault(s => s.SKILL_NAME.Equals(skillName));
+
+				if (existingSkill != null)
+				{
+					bool isSkillPresent = candidate.Skills.Any(c => c.SkillID == existingSkill.SkillID);
+					if (!isSkillPresent)
+					{
+						skillList.Add(existingSkill);
+					}
+				}
+				else
+				{
+					// If the skill doesn't exist, create a new one
+					var newSkill = new Skill { SKILL_NAME = skillName };
+					skillList.Add(newSkill);
+				}
 			}
-			return skillList;
+			List<Skill> duplicateSkillsList = new List<Skill>();
+			foreach (var item in skillList)
+			{
+				// Check if the skill already exists in the candidate's skills (either by SkillName or SkillID)
+				bool skillExists = candidate.Skills.Any(c => c.SKILL_NAME == item.SKILL_NAME || c.SkillID == item.SkillID);
+
+				if (!skillExists)
+				{
+					// If the skill doesn't exist, add it to the duplicateSkillsList
+					duplicateSkillsList.Add(item);
+				}
+			}
+			return duplicateSkillsList;
 		}
 
 		private int CandidateExists(string name, string? email, string? phone)
@@ -137,6 +183,23 @@ namespace ResumeSystem.Models
 				.Where(skill => !candidate.Skills.Any(c => c.SKILL_NAME == skill.SKILL_NAME))
 				.ToList();
 			candidate.Skills.ToList().AddRange(uniqueSkills);
+		}
+	}
+
+	public class SkillComparer : IEqualityComparer<Skill>
+	{
+		public bool Equals(Skill x, Skill y)
+		{
+			// Check if both skills are the same based on SKILL_NAME and SkillID
+			if (x == null || y == null) return false;
+			return x.SKILL_NAME == y.SKILL_NAME && x.SkillID == y.SkillID;
+		}
+
+		public int GetHashCode(Skill obj)
+		{
+			// Combine both SkillID and SKILL_NAME to generate a unique hash
+			if (obj == null) return 0;
+			return obj.SKILL_NAME.GetHashCode() ^ obj.SkillID.GetHashCode();
 		}
 	}
 }
