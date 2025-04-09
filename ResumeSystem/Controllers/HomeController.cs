@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 using OpenAI;
 using OpenAI.Chat;
 using ResumeSystem.Models;
@@ -21,6 +22,7 @@ namespace ResumeSystem.Controllers
             var apiKey = config["OpenAI:ApiKey"];
             _prompt = config["AI:Prompt"]; 
             _client = new OpenAIClient(apiKey);
+            _prompt = config["AI:Prompt"];
         }
 
         public IActionResult Index() => View();
