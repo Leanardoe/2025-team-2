@@ -21,7 +21,7 @@ namespace ResumeSystem.Models
 				RESUME_STRING = Resume.ResumeToString(filePath)
 			};
 
-			AIData = "{Huey Louis,Email@email.com,555-808-9987}|C#,Java,Music,Singing,Jelly Sandwich,Hunting,The News"; //remove this later
+			//AIData = "{Huey Louis,Email@email.com,555-808-9987}|C#,Java,Music,Singing,Jelly Sandwich,Hunting,The News"; //remove this later
 
 			var split = AIData.Split('|');
 			Candidate candidate;
@@ -180,7 +180,7 @@ namespace ResumeSystem.Models
 			foreach (var skillName in stringList)
 			{
 				var existingSkill = _context.Skills
-					.FirstOrDefault(s => s.SKILL_NAME.Equals(skillName));
+					.FirstOrDefault(s => s.SKILL_NAME.ToLower().Equals(skillName.ToLower()));
 
 				if (existingSkill != null)
 				{

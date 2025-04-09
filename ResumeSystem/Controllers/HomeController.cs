@@ -30,10 +30,14 @@ namespace ResumeSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Test(IFormFile resumeFile)
         {
+            var result = await AIProcess.ProcessResumeAsync(resumeFile,_prompt,_client);
 
-            FileUpload fileUpload = new FileUpload(context);
+            if (result.Correct)
+            {
+                FileUpload fileUpload = new FileUpload(context);
 
-            fileUpload.ResumeUpload("wertyuisdfghjsdfgerty.", "...");
+                fileUpload.ResumeUpload("aaaaaaaaaaaaaaaaaa.", result.Text);
+            }
 
             return View();
         }

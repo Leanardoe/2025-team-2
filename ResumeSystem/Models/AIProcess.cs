@@ -21,10 +21,10 @@ namespace ResumeSystem.Models
             return new Candidate();
         }
 
-        public static async Task<string> ProcessResumeAsync(IFormFile resumeFile, string prompt, OpenAIClient client)
+        public static async Task<Response> ProcessResumeAsync(IFormFile resumeFile, string prompt, OpenAIClient client)
         {
             if (resumeFile == null || resumeFile.Length == 0)
-                return "❌ Please upload a valid .txt resume file.";
+                return new Response("❌ Please upload a valid .txt resume file.",false);
 
             string resumeText;
             try
@@ -33,11 +33,11 @@ namespace ResumeSystem.Models
                 resumeText = await reader.ReadToEndAsync();
 
                 if (string.IsNullOrWhiteSpace(resumeText))
-                    return "❌ The uploaded file appears to be empty.";
+                    return new Response("❌ The uploaded file appears to be empty.",false);
             }
             catch (Exception readEx)
             {
-                return $"❌ Failed to read uploaded file: {readEx.Message}";
+                return new Response($"❌ Failed to read uploaded file: {readEx.Message}",false);
             }
 
             string fullPrompt = $"{prompt}\n\n{resumeText}";
@@ -59,16 +59,16 @@ namespace ResumeSystem.Models
                 var resultContent = response?.FirstChoice?.Message?.Content?.ToString();
 
                 return string.IsNullOrWhiteSpace(resultContent)
-                    ? "⚠️ OpenAI returned no content. The response was empty."
-                    : resultContent;
+                    ? new Response("⚠️ OpenAI returned no content. The response was empty.",false)
+                    : new Response(resultContent,true);
             }
             catch (HttpRequestException ex)
             {
-                return $"❌ OpenAI HTTP error: {ex.Message}";
+                return new Response($"❌ OpenAI HTTP error: {ex.Message}",false);
             }
             catch (Exception ex)
             {
-                return $"❌ Unexpected error: {ex.Message}";
+                return new Response($"❌ Unexpected error: {ex.Message}",false);
             }
         }
     }
