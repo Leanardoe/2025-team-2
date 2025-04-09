@@ -10,6 +10,7 @@ namespace ResumeSystem.Controllers
     public class HomeController : Controller
     {
         private readonly OpenAIClient _client;
+        private readonly string _prompt;
 
 		private ResumeContext context;
 
@@ -17,6 +18,8 @@ namespace ResumeSystem.Controllers
         {
 			context = ctx;
 			var apiKey = config["OpenAI:ApiKey"];
+            var apiKey = config["OpenAI:ApiKey"];
+            _prompt = config["AI:Prompt"]; 
             _client = new OpenAIClient(apiKey);
         }
 
@@ -53,20 +56,19 @@ namespace ResumeSystem.Controllers
                     return View();
                 }
 
-                var prompt = $"Extract a list of technical and professional skills from the following resume text:\n\n{resumeText}\n\nReturn them as a bullet list.";
-
-                try
-                {
-                    var chatRequest = new ChatRequest(
-                        new[]
-                        {
+            try
+            {
+                var chatRequest = new ChatRequest(
+                    new[]
+                    {
                         new Message(Role.System, "You are a resume skill extractor."),
-                        new Message(Role.User, prompt)
-                        },
-                        model: "gpt-3.5-turbo",
-                        temperature: 0.4,
-                        maxTokens: 500
-                    );
+                        new Message(Role.User, _prompt)
+                    },
+                    model: "gpt-3.5-turbo",
+                    //model: "gpt-4o", (switch to 4o for production tests)
+                    temperature: 0.4,
+                    maxTokens: 500
+                );
 
                     var response = await _client.ChatEndpoint.GetCompletionAsync(chatRequest);
 
