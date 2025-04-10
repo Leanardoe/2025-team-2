@@ -20,7 +20,7 @@ namespace ResumeSystem.Models
 
         public void Filter()
         {
-            //Returns a list of resumes that have the users specified skills and stores it in the private Resumes variable. May do filterAdd and filterRemove to save time.
+            //TODO Returns a list of resumes that have the users specified skills and stores it in the private Resumes variable. May do filterAdd and filterRemove to save time.
 
         }
 

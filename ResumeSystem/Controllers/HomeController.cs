@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using OpenAI;
-using OpenAI.Chat;
 using ResumeSystem.Models;
 using ResumeSystem.Models.Database;
-using System.Text;
 
 namespace ResumeSystem.Controllers
 {
@@ -32,11 +29,12 @@ namespace ResumeSystem.Controllers
         {
             var result = await AIProcess.ProcessResumeAsync(resumeFile,_prompt,_client);
 
-            if (result.Correct)
+            if (result.Correct) //carry on if AI API did not fail
             {
                 FileUpload fileUpload = new FileUpload(context);
 
-                fileUpload.ResumeUpload("aaaaaaaaaaaaaaaaaa.", result.Text);
+                //TODO we will determine where the resume is stored later
+                fileUpload.ResumeUpload("aaaaaaaaaaaaaaaaaa", result.Text);
             }
 
             return View();

@@ -2,6 +2,8 @@
 using ResumeSystem.Models.Database;
 using System.Text.RegularExpressions;
 
+//TODO implement encryption
+
 namespace ResumeSystem.Models
 {
     public class FileUpload
@@ -21,8 +23,6 @@ namespace ResumeSystem.Models
 				RESUME_STRING = Resume.ResumeToString(filePath)
 			};
 
-			//AIData = "{Huey Louis,Email@email.com,555-808-9987}|C#,Java,Music,Singing,Jelly Sandwich,Hunting,The News"; //remove this later
-
 			var split = AIData.Split('|');
 			Candidate candidate;
 			List<Skill> skills;
@@ -31,15 +31,15 @@ namespace ResumeSystem.Models
 				candidate = FindCandidate(split[0]);
 				skills = FindSkills(split[1],candidate);
 
-				// Go through each skill and add only if it's not already present
+				//check if candidate already has skill and if not add it.
 				foreach (var skill in skills)
 				{
 					try
 					{
-						// Check if it's already in the candidate's skills
+						//check if candidate has skill
 						var existingLink = _context.Set<CandidateSkill>()
 						.FirstOrDefault(cs => cs.CandidateID == candidate.CandidateID && cs.SkillID == skill.SkillID);
-
+						//we are manually handling the junction table automatically as I had problems with EFCore
 						if (existingLink == null)
 						{
 							candidate.CandidateSkills.Add(new CandidateSkill
@@ -55,10 +55,10 @@ namespace ResumeSystem.Models
 					}
 				}
 
-				// Add resume to the candidate's resume collection
+				//add resume to candidate
 				candidate.Resumes.Add(resume);
 
-				// You only need to update the candidate once after modifying the skills and resumes
+				//update candidate if it exists, otherwise add a candidate
 				if (candidate.CandidateID != 0)
 				{
 					_context.Candidates.Update(candidate);
@@ -68,12 +68,13 @@ namespace ResumeSystem.Models
 					_context.Candidates.Add(candidate);
 				}
 
-				// Save all changes to the database at once
+				//save the database
 				_context.SaveChanges();
 			}
 		}
 
-        public void ResumeUpload(string filePath, string AIData, Candidate candidate)
+		//this will be used when the user enters candidate info manually
+		public void ResumeUpload(string filePath, string AIData, Candidate candidate)
         {
             var resume = new Resume
             {
@@ -81,61 +82,61 @@ namespace ResumeSystem.Models
                 RESUME_STRING = Resume.ResumeToString(filePath)
             };
 
-            AIData = "{Huey Louis,Email@email.com,555-808-9987}|C#,Java,Music,Singing,Jelly Sandwich,Hunting,The News"; //remove this later
 
-            var split = AIData.Split('|');
+            var split = AIData.Split('|'); //split the data into candidate info
             List<Skill> skills;
             if (split.Length > 1)
             {
                 skills = FindSkills(split[1], candidate);
 
-                // Go through each skill and add only if it's not already present
-                foreach (var skill in skills)
-                {
-                    try
-                    {
-                        // Check if it's already in the candidate's skills
-                        var existingLink = _context.Set<CandidateSkill>()
-                        .FirstOrDefault(cs => cs.CandidateID == candidate.CandidateID && cs.SkillID == skill.SkillID);
+				//check if candidate already has skill and if not add it.
+				foreach (var skill in skills)
+				{
+					try
+					{
+						//check if candidate has skill
+						var existingLink = _context.Set<CandidateSkill>()
+						.FirstOrDefault(cs => cs.CandidateID == candidate.CandidateID && cs.SkillID == skill.SkillID);
+						//we are manually handling the junction table automatically as I had problems with EFCore
+						if (existingLink == null)
+						{
+							candidate.CandidateSkills.Add(new CandidateSkill
+							{
+								Candidate = candidate,
+								Skill = skill
+							});
+						}
+					}
+					catch
+					{
+						Console.WriteLine($"Error adding skill {skill.SkillID} - {skill.SKILL_NAME}");
+					}
+				}
 
-                        if (existingLink == null)
-                        {
-                            candidate.CandidateSkills.Add(new CandidateSkill
-                            {
-                                Candidate = candidate,
-                                Skill = skill
-                            });
-                        }
-                    }
-                    catch
-                    {
-                        Console.WriteLine($"Error adding skill {skill.SkillID} - {skill.SKILL_NAME}");
-                    }
-                }
+				//add resume to candidate
+				candidate.Resumes.Add(resume);
 
-                // Add resume to the candidate's resume collection
-                candidate.Resumes.Add(resume);
+				//update candidate if it exists, otherwise add a candidate
+				if (candidate.CandidateID != 0)
+				{
+					_context.Candidates.Update(candidate);
+				}
+				else
+				{
+					_context.Candidates.Add(candidate);
+				}
 
-                // You only need to update the candidate once after modifying the skills and resumes
-                if (candidate.CandidateID != 0)
-                {
-                    _context.Candidates.Update(candidate);
-                }
-                else
-                {
-                    _context.Candidates.Add(candidate);
-                }
-
-                // Save all changes to the database at once
-                _context.SaveChanges();
-            }
+				//save the database
+				_context.SaveChanges();
+			}
         }
 
+		//determine if a candidate exists based on name, email and phone, extracted from CandidateInfo
         private Candidate FindCandidate(string CandidateInfo)
         {
 			Candidate candidate = new Candidate();
 
-			CandidateInfo = CandidateInfo.Replace("{", "").Replace("}", "").Trim();
+			CandidateInfo = CandidateInfo.Trim();
 			var candidateInfo = CandidateInfo.Split(',');
 
             for (int i = 0; i < candidateInfo.Length; i++)
@@ -152,10 +153,9 @@ namespace ResumeSystem.Models
 
 			int key = CandidateExists(candidate.CAN_NAME, candidate.CAN_EMAIL, candidate.CAN_PHONE);
 
-			if (key == -1)
+			if (key == -1) //candidate does not exist in the database
 			{
 				_context.Candidates.Add(candidate);
-				//await _context.SaveChangesAsync(); //We can save in the resumeUpload function
 			}
 			else
 			{
@@ -165,12 +165,12 @@ namespace ResumeSystem.Models
 					candidate = existingCandidate;
 				}
 
-				
 			}
 
 			return candidate;
 		}
 
+		//determine if any skills in the list already exists in the database
 		private List<Skill> FindSkills(string SkillsInfo, Candidate candidate)
 		{
 			var stringList = SkillsInfo.Split(',').Distinct().Select(str => str.Trim());
@@ -188,7 +188,7 @@ namespace ResumeSystem.Models
 				}
 				else
 				{
-					// If the skill doesn't exist, create a new one
+					//does not exist add a new one
 					var newSkill = new Skill { SKILL_NAME = skillName };
 					skillList.Add(newSkill);
 				}
@@ -207,7 +207,7 @@ namespace ResumeSystem.Models
 			return candidate?.CandidateID ?? -1;
 		}
 
-		private bool isEmail(string str)
+		private bool isEmail(string str) //determines if something meets the criteria of an email, just a fallback if AI is out of order
 		{
 			string pattern = @"^[a-zA-Z0-9._-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$";
 
@@ -216,30 +216,13 @@ namespace ResumeSystem.Models
 			return regex.IsMatch(str);
 		}
 
-		private bool isPhone(string str)
+		private bool isPhone(string str) //determines if something meets the criteria of a phone number, just a fallback if AI is out of order
 		{
 			string pattern = @"^(?:\+?\d{1,}[\s\-]?)?\(?(\d{3})\)?[\s\-]?\d{3}[\s\-]?\d{4}$";
 
 			Regex regex = new Regex(pattern);
 
 			return regex.IsMatch(str);
-		}
-	}
-
-	public class SkillComparer : IEqualityComparer<Skill>
-	{
-		public bool Equals(Skill x, Skill y)
-		{
-			// Check if both skills are the same based on SKILL_NAME and SkillID
-			if (x == null || y == null) return false;
-			return x.SKILL_NAME == y.SKILL_NAME && x.SkillID == y.SkillID;
-		}
-
-		public int GetHashCode(Skill obj)
-		{
-			// Combine both SkillID and SKILL_NAME to generate a unique hash
-			if (obj == null) return 0;
-			return obj.SKILL_NAME.GetHashCode() ^ obj.SkillID.GetHashCode();
 		}
 	}
 }

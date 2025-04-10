@@ -20,22 +20,21 @@ namespace ResumeSystem.Models.Database
 		[Required(ErrorMessage = "Resume content is required.")]
 		public string RESUME_STRING { get; set; }
 
-		//public ICollection<Candidate> Candidates { get; set; } = new List<Candidate>();
-
-		//ignore for database stuff for resume
+		//ignore for database stuff for resume search
 		[NotMapped]
         public int Score { get; set; }
 
         public static string ResumeToString(string filePath)
         {
+			//this is easier than I thought it would be
 			try
 			{
-				// Read all text from the file at the given path
+				//file to string
 				return File.ReadAllText(filePath, Encoding.UTF8);
 			}
 			catch (Exception ex)
 			{
-				// Handle or log the error as needed
+				//handle error you know how a try catch works
 				return $"Error reading file: {ex.Message}";
 			}
 		}
