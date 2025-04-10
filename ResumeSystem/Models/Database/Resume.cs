@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
@@ -22,39 +20,23 @@ namespace ResumeSystem.Models.Database
 		[Required(ErrorMessage = "Resume content is required.")]
 		public string RESUME_STRING { get; set; }
 
-		//ignore for database stuff for resume
+		//ignore for database stuff for resume search
 		[NotMapped]
         public int Score { get; set; }
 
-        //ignore for keyword search you will need to add your own constructor
-        public Resume(string str)
-        {
-            RESUME_STRING = str;
-        }
-
-        //default constructor just
-        public Resume()
-        {
-
-        }
-
         public static string ResumeToString(string filePath)
         {
-            //use  https://www.nuget.org/packages/documentformat.openxml to dump the resume to a string that should be lowercase.
-            using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(filePath, false))
-            {
-                var body = wordDoc.MainDocumentPart?.Document?.Body;
-                if (body == null) { return "--NO STRING FOUND--"; }
-
-                StringBuilder sb = new StringBuilder(1024);
-
-                foreach (var text in body.Descendants<Text>())
-                {
-                    sb.Append(text.Text).Append(' ');
-                }
-                
-                return sb.ToString().ToLower();
-            }
-        }
+			//this is easier than I thought it would be
+			try
+			{
+				//file to string
+				return File.ReadAllText(filePath, Encoding.UTF8);
+			}
+			catch (Exception ex)
+			{
+				//handle error you know how a try catch works
+				return $"Error reading file: {ex.Message}";
+			}
+		}
 	}
 }

@@ -1,18 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OpenAI;
-using OpenAI.Chat;
-using System.Text;
+using ResumeSystem.Models;
+using ResumeSystem.Models.Database;
 
 namespace ResumeSystem.Controllers
 {
     public class HomeController : Controller
     {
         private readonly OpenAIClient _client;
+        private readonly string _prompt;
 
-        public HomeController(IConfiguration config)
+		private ResumeContext context;
+
+		public HomeController(IConfiguration config, ResumeContext ctx)
         {
-            var apiKey = config["OpenAI:ApiKey"];
+			context = ctx;
+            var apiKey = config["OpenAI:ApiKey"]; 
             _client = new OpenAIClient(apiKey);
+            _prompt = config["AI:Prompt"];
         }
 
         public IActionResult Index() => View();
@@ -22,65 +27,14 @@ namespace ResumeSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Test(IFormFile resumeFile)
         {
-            if (resumeFile == null || resumeFile.Length == 0)
+            var result = await AIProcess.ProcessResumeAsync(resumeFile,_prompt,_client);
+
+            if (result.Correct) //carry on if AI API did not fail
             {
-                ViewBag.Result = "❌ Please upload a valid .txt resume file.";
-                return View();
-            }
+                FileUpload fileUpload = new FileUpload(context);
 
-            string resumeText;
-            try
-            {
-                using var reader = new StreamReader(resumeFile.OpenReadStream(), Encoding.UTF8);
-                resumeText = await reader.ReadToEndAsync();
-
-                if (string.IsNullOrWhiteSpace(resumeText))
-                {
-                    ViewBag.Result = "❌ The uploaded file appears to be empty.";
-                    return View();
-                }
-            }
-            catch (Exception readEx)
-            {
-                ViewBag.Result = $"❌ Failed to read uploaded file: {readEx.Message}";
-                return View();
-            }
-
-            var prompt = $"Extract a list of technical and professional skills from the following resume text:\n\n{resumeText}\n\nReturn them as a bullet list.";
-
-            try
-            {
-                var chatRequest = new ChatRequest(
-                    new[]
-                    {
-                        new Message(Role.System, "You are a resume skill extractor."),
-                        new Message(Role.User, prompt)
-                    },
-                    model: "gpt-3.5-turbo",
-                    temperature: 0.4,
-                    maxTokens: 500
-                );
-
-                var response = await _client.ChatEndpoint.GetCompletionAsync(chatRequest);
-
-                var resultContent = response?.FirstChoice?.Message?.Content?.ToString();
-
-                if (string.IsNullOrWhiteSpace(resultContent))
-                {
-                    ViewBag.Result = "⚠️ OpenAI returned no content. The response was empty.";
-                }
-                else
-                {
-                    ViewBag.Result = resultContent;
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                ViewBag.Result = $"❌ OpenAI HTTP error: {ex.Message}";
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Result = $"❌ Unexpected error: {ex.Message}";
+                //TODO we will determine where the resume is stored later
+                fileUpload.ResumeUpload("aaaaaaaaaaaaaaaaaa", result.Text);
             }
 
             return View();
