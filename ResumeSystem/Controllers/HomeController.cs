@@ -1,43 +1,53 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OpenAI;
-using ResumeSystem.Models;
-using ResumeSystem.Models.Database;
 
 namespace ResumeSystem.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly OpenAIClient _client;
-        private readonly string _prompt;
-
-		private ResumeContext context;
-
-		public HomeController(IConfiguration config, ResumeContext ctx)
+        // Home landing logic
+        public IActionResult Index()
         {
-			context = ctx;
-            var apiKey = config["OpenAI:ApiKey"]; 
-            _client = new OpenAIClient(apiKey);
-            _prompt = config["AI:Prompt"];
+            if (!IsUserLoggedIn())
+                return RedirectToAction("SignIn");
+
+            return RedirectToAction("Uploading", "Resume");
         }
 
-        public IActionResult Index() => View();
-
-        public IActionResult Test() => View();
+        // Login page
+        public IActionResult SignIn() => View();
 
         [HttpPost]
-        public async Task<IActionResult> Test(IFormFile resumeFile)
+        public IActionResult SignIn(string email, string password)
         {
-            var result = await AIProcess.ProcessResumeAsync(resumeFile,_prompt,_client);
-
-            if (result.Correct) //carry on if AI API did not fail
+            // Example login logic
+            if (email == "admin@example.com" && password == "password")
             {
-                FileUpload fileUpload = new FileUpload(context);
-
-                //TODO we will determine where the resume is stored later
-                fileUpload.ResumeUpload("aaaaaaaaaaaaaaaaaa", result.Text);
+                HttpContext.Session.SetString("UserEmail", email);
+                return RedirectToAction("Uploading", "Resume");
             }
 
+            ViewBag.ErrorMessage = "Invalid credentials.";
             return View();
+        }
+
+        public IActionResult SignOut()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("SignIn");
+        }
+
+        // Optional page with nav previews or hub
+        public IActionResult NavPage()
+        {
+            if (!IsUserLoggedIn())
+                return RedirectToAction("SignIn");
+
+            return View();
+        }
+
+        private bool IsUserLoggedIn()
+        {
+            return HttpContext.Session.GetString("UserEmail") != null;
         }
     }
 }
