@@ -32,9 +32,11 @@ namespace ResumeSystem.Controllers
             if (result.Correct) //carry on if AI API did not fail
             {
                 FileUpload fileUpload = new FileUpload(context);
+                
+
 
                 //TODO we will determine where the resume is stored later
-                fileUpload.ResumeUpload("aaaaaaaaaaaaaaaaaa", result.Text);
+                fileUpload.ResumeUpload("aaaaaaaaaaaaaaaaaa", result.Text, result.ResumeBody);
             }
 
             return View();

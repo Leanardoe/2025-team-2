@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Packaging;
+using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models.Database;
+using System.Text;
 using System.Text.RegularExpressions;
+using UglyToad.PdfPig;
 
 //TODO implement encryption
 
@@ -15,12 +18,12 @@ namespace ResumeSystem.Models
 		{
 			_context = context;
 		}
-		public void ResumeUpload(string filePath, string AIData)
+		public void ResumeUpload(string filePath, string AIData, string resumeBody)
         {
 			var resume = new Resume
 			{
 				RESUME_URL = filePath,
-				RESUME_STRING = Resume.ResumeToString(filePath)
+				RESUME_STRING = resumeBody
 			};
 
 			var split = AIData.Split('|');
@@ -223,6 +226,76 @@ namespace ResumeSystem.Models
 			Regex regex = new Regex(pattern);
 
 			return regex.IsMatch(str);
+		}
+
+		public static string FileConverter(string filePath)
+		{
+			if (Path.GetExtension(filePath).ToLower() == ".docx") // word document
+			{
+				var sb = new StringBuilder();
+				using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, false))
+				{
+					var body = doc.MainDocumentPart.Document.Body;
+					sb.Append(body.InnerText);
+				}
+				return sb.ToString();
+			}
+			else if (Path.GetExtension(filePath).ToLower() == ".txt") // text file
+			{
+				using var reader = new StreamReader(filePath, Encoding.UTF8);
+				return reader.ReadToEnd();
+			}
+			else if (Path.GetExtension(filePath).ToLower() == ".pdf") // pdf file
+			{
+				var sb = new StringBuilder();
+				using (var document = PdfDocument.Open(filePath))
+				{
+					foreach (var page in document.GetPages())
+					{
+						sb.AppendLine(page.Text);  // Extracts only text from the pages
+					}
+				}
+				return sb.ToString();
+			}
+
+			return "--!!XX!!--";
+		}
+
+		public static string FileConverter(IFormFile file)
+		{
+			string extension = Path.GetExtension(file.FileName).ToLower();
+
+			if (extension == ".docx") // Word document
+			{
+				var sb = new StringBuilder();
+				using (var stream = file.OpenReadStream())
+				using (var doc = WordprocessingDocument.Open(stream, false))
+				{
+					var body = doc.MainDocumentPart.Document.Body;
+					sb.Append(body.InnerText);
+				}
+				return sb.ToString();
+			}
+			else if (extension == ".txt") // Text file
+			{
+				using var reader = new StreamReader(file.OpenReadStream(), Encoding.UTF8);
+				return reader.ReadToEnd();
+			}
+			else if (extension == ".pdf") // PDF file
+			{
+				var sb = new StringBuilder();
+				using (var stream = file.OpenReadStream())
+				using (var document = PdfDocument.Open(stream))
+				{
+					foreach (var page in document.GetPages())
+					{
+						sb.AppendLine(page.Text);
+					}
+				}
+				return sb.ToString();
+			}
+
+			return "--!!XX!!--"; // Unsupported file
 		}
 	}
 }

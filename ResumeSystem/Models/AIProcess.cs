@@ -10,13 +10,12 @@ namespace ResumeSystem.Models
         public static async Task<Response> ProcessResumeAsync(IFormFile resumeFile, string prompt, OpenAIClient client)
         {
             if (resumeFile == null || resumeFile.Length == 0)
-                return new Response("❌ Please upload a valid .txt resume file.",false);
+                return new Response("❌ Please upload a valid .txt, .pdf or .docx resume file.",false);
 
             string resumeText;
             try
             {
-                using var reader = new StreamReader(resumeFile.OpenReadStream(), Encoding.UTF8);
-                resumeText = await reader.ReadToEndAsync();
+                resumeText = FileUpload.FileConverter(resumeFile);
 
                 if (string.IsNullOrWhiteSpace(resumeText))
                     return new Response("❌ The uploaded file appears to be empty.",false);
@@ -46,7 +45,7 @@ namespace ResumeSystem.Models
 
                 return string.IsNullOrWhiteSpace(resultContent)
                     ? new Response("⚠️ OpenAI returned no content. The response was empty.",false)
-                    : new Response(resultContent,true);
+                    : new Response(resultContent,true,resumeText);
             }
             catch (HttpRequestException ex)
             {
