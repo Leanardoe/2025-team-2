@@ -4,50 +4,38 @@ namespace ResumeSystem.Controllers
 {
     public class HomeController : Controller
     {
-        // Home landing logic
+        // Placeholder: Disable session check for now
+        private bool IsUserLoggedIn() => true;
+
         public IActionResult Index()
         {
-            if (!IsUserLoggedIn())
-                return RedirectToAction("SignIn");
-
+            // Directly go to Uploading page for now
             return RedirectToAction("Uploading", "Resume");
         }
 
-        // Login page
         public IActionResult SignIn() => View();
 
         [HttpPost]
         public IActionResult SignIn(string email, string password)
         {
-            // Example login logic
-            if (email == "admin@example.com" && password == "password")
-            {
-                HttpContext.Session.SetString("UserEmail", email);
-                return RedirectToAction("Uploading", "Resume");
-            }
+            // Placeholder: Always treat login as successful
+            // You can re-enable this logic when session is configured:
+            // HttpContext.Session.SetString("UserEmail", email);
 
-            ViewBag.ErrorMessage = "Invalid credentials.";
-            return View();
+            return RedirectToAction("Uploading", "Resume");
         }
 
         public IActionResult SignOut()
         {
-            HttpContext.Session.Clear();
+            // Placeholder: no-op
+            // HttpContext.Session.Clear();
             return RedirectToAction("SignIn");
         }
 
-        // Optional page with nav previews or hub
         public IActionResult NavPage()
         {
-            if (!IsUserLoggedIn())
-                return RedirectToAction("SignIn");
-
+            // Placeholder: always allow access
             return View();
-        }
-
-        private bool IsUserLoggedIn()
-        {
-            return HttpContext.Session.GetString("UserEmail") != null;
         }
     }
 }
