@@ -47,7 +47,7 @@ namespace ResumeSystem.Controllers
             {
                 string fileName = Path.GetFileNameWithoutExtension(resumeFile.FileName);
                 FileUpload fileUpload = new FileUpload(_context);
-                fileUpload.ResumeUpload(fileName, result.Text);
+                fileUpload.ResumeUpload(fileName, result.Text,result.ResumeBody);
                 ViewBag.Message = "Resume processed and skills saved successfully.";
             }
             else
@@ -79,7 +79,7 @@ namespace ResumeSystem.Controllers
                 {
                     string fileName = Path.GetFileNameWithoutExtension(resumeFile.FileName);
                     FileUpload fileUpload = new FileUpload(_context);
-                    fileUpload.ResumeUpload(fileName, result.Text);
+                    fileUpload.ResumeUpload(fileName, result.Text, result.ResumeBody);
                 }
             }
 

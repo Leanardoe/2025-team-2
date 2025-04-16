@@ -77,12 +77,12 @@ namespace ResumeSystem.Models
 		}
 
 		//this will be used when the user enters candidate info manually
-		public void ResumeUpload(string filePath, string AIData, Candidate candidate)
+		public void ResumeUpload(string filePath, string AIData, string resumeBody, Candidate candidate)
         {
             var resume = new Resume
             {
                 RESUME_URL = filePath,
-                RESUME_STRING = Resume.ResumeToString(filePath)
+                RESUME_STRING = resumeBody
             };
 
 
