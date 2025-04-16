@@ -1,4 +1,5 @@
 ﻿using Ganss.Text;
+using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models.Database;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -6,26 +7,30 @@ namespace ResumeSystem.Models
 {
     public class QuerySearch
     {
-        
+        private ResumeContext _context;
 
-        [Required]
-        public int SearchID { get; set; }
-        [Required]
-        public int UserID { get; set; }
-
-        public User User { get; set; }
-
-        [NotMapped]
+        public QuerySearch(ResumeContext ctx)
+        {
+            _context = ctx;
+        }
         private List<Resume> Resumes { get; set; }
 
-        public void Filter()
-        {
-            //TODO Returns a list of resumes that have the users specified skills and stores it in the private Resumes variable. May do filterAdd and filterRemove to save time.
+		public async Task FilterAsync(List<Skill> skills)
+		{
+			var skillIdSet = skills.Select(s => s.SkillID).ToHashSet();
 
-        }
+			var candidates = await _context.Candidates
+				.Where(c =>
+					skillIdSet.All(id => c.CandidateSkills.Any(cs => cs.SkillID == id))
+				)
+				.Include(c => c.Resumes)
+				.ToListAsync();
 
-        // list<resume>
-        public List<Resume> KeywordSearch(List<string> keywords)
+			Resumes = candidates.SelectMany(c => c.Resumes).ToList();
+		}
+
+		// list<resume>
+		public List<Resume> KeywordSearch(List<string> keywords)
         {
             Resumes = new List<Resume>();
             var newResumes = new List<Resume>();
@@ -37,9 +42,11 @@ namespace ResumeSystem.Models
                 var results = ac.Search(resume.RESUME_STRING).ToList();
 
 				resume.Score = ScoreList(results);
+                resume.Matches = results.Count();
                 newResumes.Add(resume);
 			}
-            return newResumes;
+            //return newResumes;
+			return newResumes.OrderByDescending(r => r.Score).ToList();
 		}
 
         public int ScoreList(IList<WordMatch> resumeslist)

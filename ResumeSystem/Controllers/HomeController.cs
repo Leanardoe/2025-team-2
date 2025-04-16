@@ -24,7 +24,7 @@ namespace ResumeSystem.Controllers
 
         public IActionResult Test() => View();
 
-        [HttpPost]
+		[HttpPost]
         public async Task<IActionResult> Test(IFormFile resumeFile)
         {
             var result = await AIProcess.ProcessResumeAsync(resumeFile,_prompt,_client);
@@ -33,8 +33,6 @@ namespace ResumeSystem.Controllers
             {
                 FileUpload fileUpload = new FileUpload(context);
                 
-
-
                 //TODO we will determine where the resume is stored later
                 fileUpload.ResumeUpload("aaaaaaaaaaaaaaaaaa", result.Text, result.ResumeBody);
             }

@@ -24,7 +24,10 @@ namespace ResumeSystem.Models.Database
 		[NotMapped]
         public int Score { get; set; }
 
-        public static string ResumeToString(string filePath)
+		[NotMapped]
+		public int Matches { get; set; }
+
+		public static string ResumeToString(string filePath)
         {
 			//this is easier than I thought it would be
 			try
