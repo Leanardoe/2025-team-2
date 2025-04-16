@@ -1,44 +1,42 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OpenAI;
-using ResumeSystem.Models;
-using ResumeSystem.Models.Database;
 
 namespace ResumeSystem.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly OpenAIClient _client;
-        private readonly string _prompt;
+        // Placeholder: Disable session check for now
+        private bool IsUserLoggedIn() => true;
 
-		private ResumeContext context;
-
-		public HomeController(IConfiguration config, ResumeContext ctx)
+        public IActionResult Index()
         {
-			context = ctx;
-            var apiKey = config["OpenAI:ApiKey"]; 
-            _client = new OpenAIClient(apiKey);
-            _prompt = config["AI:Prompt"];
+            // Directly go to Uploading page for now
+            return RedirectToAction("Uploading", "Resume");
         }
 
-        public IActionResult Index() => View();
+        public IActionResult SignIn() => View();
 
         public IActionResult Test() => View();
 
         [HttpPost]
-        public async Task<IActionResult> Test(IFormFile resumeFile)
+        public IActionResult SignIn(string email, string password)
         {
-            var result = await AIProcess.ProcessResumeAsync(resumeFile,_prompt,_client);
+            // Placeholder: Always treat login as successful
+            // You can re-enable this logic when session is configured:
+            // HttpContext.Session.SetString("UserEmail", email);
 
-            if (result.Correct) //carry on if AI API did not fail
-            {
-                FileUpload fileUpload = new FileUpload(context);
-                
+            return RedirectToAction("Uploading", "Resume");
+        }
 
+        public IActionResult SignOut()
+        {
+            // Placeholder: no-op
+            // HttpContext.Session.Clear();
+            return RedirectToAction("SignIn");
+        }
 
-                //TODO we will determine where the resume is stored later
-                fileUpload.ResumeUpload("aaaaaaaaaaaaaaaaaa", result.Text, result.ResumeBody);
-            }
-
+        public IActionResult NavPage()
+        {
+            // Placeholder: always allow access
             return View();
         }
     }
