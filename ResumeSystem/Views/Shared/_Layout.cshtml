@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -34,10 +36,20 @@
                             <span class="ms-2">Filtering</span>
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link px-4 d-flex align-items-center" asp-controller="Home" asp-action="SignIn">
-                            <span class="ms-2">Sign Out</span>
-                        </a>
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <a class="nav-link px-4 d-flex align-items-center" asp-controller="Account" asp-action="SignOut">
+                                <span class="ms-2">Sign Out</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="nav-link px-4 d-flex align-items-center" asp-controller="Account" asp-action="SignIn">
+                                <span class="ms-2">Sign In</span>
+                            </a>
+                        }
                     </li>
                 </ul>
                 <div class="d-none d-xl-flex align-items-center ms-auto">
