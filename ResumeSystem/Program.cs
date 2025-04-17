@@ -1,6 +1,7 @@
 using OpenAI;
 using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models.Database;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,15 @@ builder.Services.AddSingleton<OpenAIClient>(_ =>
 builder.Services.AddDbContext<ResumeContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ResumeContext")));
 
+builder.Services.AddIdentity<User, IdentityRole>()
+	.AddEntityFrameworkStores<ResumeContext>()
+	.AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+	options.LoginPath = "/Account/SignIn"; // This overrides the default
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -43,6 +53,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",

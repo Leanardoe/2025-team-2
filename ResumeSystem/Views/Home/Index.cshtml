@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
+@inject SignInManager<User> SignInManager
 
 @{
     ViewData["Title"] = "Home";
@@ -10,7 +10,7 @@
     {
         <h2 class="display-5 mb-4">Welcome to the Resume Interpreter</h2>
         <p class="lead mb-4">Please log in to upload and process resumes using AI.</p>
-        <a asp-controller="Home" asp-action="SignIn" class="btn btn-primary px-4 py-2">Sign In</a>
+        <a asp-controller="Account" asp-action="SignIn" class="btn btn-primary px-4 py-2">Sign In</a>
     }
     else
     {

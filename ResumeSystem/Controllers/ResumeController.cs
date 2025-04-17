@@ -26,14 +26,12 @@ namespace ResumeSystem.Controllers
 
         public IActionResult Uploading()
         {
-            if (!IsUserLoggedIn()) return RedirectToAction("SignIn", "Home");
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Uploading(IFormFile resumeFile)
         {
-            if (!IsUserLoggedIn()) return RedirectToAction("SignIn", "Home");
 
             if (resumeFile == null || resumeFile.Length == 0)
             {
@@ -60,14 +58,12 @@ namespace ResumeSystem.Controllers
 
         public IActionResult MassUploading()
         {
-            if (!IsUserLoggedIn()) return RedirectToAction("SignIn", "Home");
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> MassUploading(List<IFormFile> resumeFiles)
         {
-            if (!IsUserLoggedIn()) return RedirectToAction("SignIn", "Home");
 
             foreach (var resumeFile in resumeFiles)
             {
@@ -89,7 +85,6 @@ namespace ResumeSystem.Controllers
 
         public IActionResult Filtering()
         {
-            if (!IsUserLoggedIn()) return RedirectToAction("SignIn", "Home");
             return View();
         }
     }
