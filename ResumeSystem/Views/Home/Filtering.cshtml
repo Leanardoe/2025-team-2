@@ -1,7 +1,6 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model ResumeSystem.Models.ResumeFilterViewModel
 @{
+    ViewData["Title"] = "Filter Resumes";
 }
 <section>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark-light">
@@ -46,57 +45,51 @@
                         </a>
                     </li>
                 </ul>
-                <div class="d-none d-xl-flex align-items-center ms-auto">
-                    <a class="btn border-0 p-0 me-6" href="#"></a><a class="btn border-0 p-0 me-8" href="#"></a>
-                    <a class="btn border-0 d-flex align-items-center p-0" href="#">
-                        <span class="ms-3 me-4 fw-bold text-white">Your Name</span>
-                        <svg width="16" height="16" viewbox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 6L8 10L12 6" stroke="#3D485B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </svg>
-                    </a>
+                <div class="container mt-5">
+                    <form asp-controller="FilterController"
+                          asp-action="Index"
+                          method="get"
+                          class="row mb-4">
+
+                        <div class="col-md-6">
+                            <label asp-for="SelectedSkillID" class="form-label">
+                                Skill
+                            </label>
+                            <select asp-for="SelectedSkillID"
+                                    asp-items="Model.SkillOptions"
+                                    class="form-select">
+                                <option value="">-- All Skills --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">
+                                Apply Filter
+                            </button>
+                        </div>
+                    </form>
+
+                    <h4 class="mb-3">Filtered Resumes</h4>
+                    @if (Model.Resumes?.Any() ?? false)
+                    {
+                        <ul class="list-group">
+                            @foreach (var r in Model.Resumes)
+                            {
+                                <li class="list-group-item">
+                                    <strong>@r.Candidate.CAN_NAME</strong>
+                                    <span class="text-muted">
+                                        (@r.Candidate.CAN_EMAIL)
+                                    </span>
+                                    <br />
+                                    <a href="@r.RESUME_URL" target="_blank">
+                                        View Resume
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No resumes match your selected skill.</p>
+                    }
                 </div>
-            </div>
-            <button class="d-block d-xl-none navbar-burger navbar-toggler py-1 px-2 border-0 rounded-1">
-                <svg width="24" height="24" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 12H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path d="M3 6H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path d="M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-            </button>
-        </div>
-    </nav>
-    <div class="d-none navbar-menu position-fixed top-0 start-0 bottom-0 w-100 mw-sm" style="z-index: 9999;">
-        <div class="navbar-close navbar-backdrop position-fixed top-0 start-0 end-0 bottom-0 bg-dark-light bg-opacity-25"></div>
-        <nav class="position-relative h-100 w-100 d-flex flex-column pt-8 pb-10 px-8 bg-dark-light overflow-auto">
-            <div class="d-flex align-items-center justify-content-between mb-16">
-                <a class="inline-flex items-center" href="#">
-                    <img class="img-fluid" src="trizzle-assets/logos/trizzle-logo.svg" alt="" />
-                </a>
-                <a class="navbar-close text-light" href="#">
-                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewbox="0 0 24 24">
-                        <path d="M 4.7070312 3.2929688 L 3.2929688 4.7070312 L 10.585938 12 L 3.2929688 19.292969 L 4.7070312 20.707031 L 12 13.414062 L 19.292969 20.707031 L 20.707031 19.292969 L 13.414062 12 L 20.707031 4.7070312 L 19.292969 3.2929688 L 12 10.585938 L 4.7070312 3.2929688 z" fill="currentColor"></path>
-                    </svg>
-                </a>
-            </div>
-            <ul class="list-unstyled mb-10">
-                <li class="mb-10"><a class="btn p-0 btn-link fs-7 text-light" href="#">Overview</a></li>
-                <li class="mb-10"><a class="btn p-0 btn-link fs-7 text-light" href="#">Analytics</a></li>
-                <li class="mb-10"><a class="btn p-0 btn-link fs-7 text-light" href="#">Products</a></li>
-                <li class="mb-10">
-                    <a class="btn p-0 btn-link fs-7 text-light d-flex align-items-center" aria-current="page" href="#">
-                        <span>Orders</span>
-                        <div class="ms-2 d-flex align-items-center justify-content-center bg-primary rounded-pill text-white fs-10" style="width: 22px; height: 22px;">4</div>
-                    </a>
-                </li>
-                <li><a class="btn p-0 btn-link text-light" href="#">Customers</a></li>
-            </ul>
-            <a class="btn mt-auto border-0 d-flex align-items-center p-0" href="#">
-                <img class="img-fluid" src="trizzle-assets/images/avatar-men.png" alt="" />
-                <span class="ms-3 me-4 fw-bold text-white">John Doe</span>
-                <svg width="16" height="16" viewbox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 6L8 10L12 6" stroke="#3D485B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-            </a>
-        </nav>
-    </div>
-</section>
