@@ -1,4 +1,5 @@
-﻿@{
+﻿
+@{
     ViewData["Title"] = "Resume Upload";
 }
 
@@ -11,7 +12,7 @@
             </div>
             <div class="bg-dark-light p-4 p-md-5 rounded-4 border border-light-dark shadow-sm">
                 <h2 class="h4 text-white mb-4">Submit Your Resume</h2>
-                <form asp-action="Uploading" method="post" enctype="multipart/form-data">
+                <form asp-controller="Resume" asp-action="Uploading" method="post" enctype="multipart/form-data">
                     <div class="position-relative mb-4">
                         <input class="form-control text-light fs-6 bg-transparent" type="text" name="name" placeholder="Enter your full name" required />
                         <span class="position-absolute top-0 start-0 ms-3 px-1 fs-10 translate-middle-y fw-medium text-secondary-light bg-dark-light">Full Name</span>

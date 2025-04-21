@@ -19,38 +19,40 @@ namespace ResumeSystem.Controllers
             _prompt = config["AI:Prompt"];
         }
 
-        private bool IsUserLoggedIn()
-        {
-            return HttpContext.Session.GetString("UserEmail") != null;
-        }
-
+        [HttpGet]
         public IActionResult Uploading()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Uploading(IFormFile resumeFile)
+        public async Task<IActionResult> Uploading(IFormFile resume, string name, string email)
         {
-
-            if (resumeFile == null || resumeFile.Length == 0)
+            try
             {
-                ViewBag.Error = "No file uploaded.";
-                return View();
+                if (resume == null)
+                {
+                    ViewBag.Error = "No file uploaded.";
+                    return View();
+                }
+
+                var result = await AIProcess.ProcessResumeAsync(resume, _prompt, _client);
+
+                if (result.Correct)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(resume.FileName);
+                    FileUpload fileUpload = new FileUpload(_context);
+                    fileUpload.ResumeUpload(fileName, result.Text, result.ResumeBody);
+                    ViewBag.Message = "Resume processed and skills saved successfully.";
+                }
+                else
+                {
+                    ViewBag.Error = result.Text;
+                }
             }
-
-            var result = await AIProcess.ProcessResumeAsync(resumeFile, _prompt, _client);
-
-            if (result.Correct)
+            catch (Exception ex) 
             {
-                string fileName = Path.GetFileNameWithoutExtension(resumeFile.FileName);
-                FileUpload fileUpload = new FileUpload(_context);
-                fileUpload.ResumeUpload(fileName, result.Text,result.ResumeBody);
-                ViewBag.Message = "Resume processed and skills saved successfully.";
-            }
-            else
-            {
-                ViewBag.Error = result.Text;
+                Console.WriteLine(ex.ToString());
             }
 
             return View();

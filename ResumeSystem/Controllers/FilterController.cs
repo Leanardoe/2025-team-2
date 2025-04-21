@@ -20,7 +20,7 @@ namespace ResumeSystem.Controllers
 
         // GET: /Filter
         [HttpGet]
-        public async Task<IActionResult> Index(int? skillId)
+        public async Task<IActionResult> Filtering(int? skillId)
         {
             // 1) Populate the skills dropdown
             var skillOptions = await context.Skills
@@ -39,14 +39,16 @@ namespace ResumeSystem.Controllers
             if (skillId.HasValue && skillId.Value > 0)
             {
                 query = query.Where(r =>
-                    r.Candidate.Skills.Any(cs => cs.SkillID == skillId.Value)
+                    r.Candidate.CandidateSkills.Any(cs => cs.SkillID == skillId.Value) // Ensure CandidateSkills collection is used
                 );
             }
 
-            // 4) Then eager‑load Candidate and their Skills
+            // 4) Then eager-load Candidate and their Skills (CandidateSkills)
             query = query
-                .Include(r => r.Candidate)
-                    .ThenInclude(c => c.Skills);
+                .Include(r => r.Candidate) // Include the Candidate
+                    .ThenInclude(c => c.CandidateSkills) // Include Candidate's skills
+                        .ThenInclude(cs => cs.Skill); // Assuming CandidateSkill has a navigation property to Skill
+
 
             // 5) Execute the query
             var resumes = await query.ToListAsync();

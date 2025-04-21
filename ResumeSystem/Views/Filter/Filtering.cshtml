@@ -1,0 +1,59 @@
+﻿@model ResumeSystem.Models.ResumeFilterViewModel
+@{
+    ViewData["Title"] = "Filter Resumes";
+}
+<section>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark-light">
+        <div class="container" type="button" aria-controls="nav01" aria-expanded="false">
+            <a class="navbar-brand" href="#">
+                <img class="img-fluid" src="trizzle-assets/logos/trizzle-logo.svg" alt="" />
+            </a>
+            <div class="collapse navbar-collapse" id="nav01">
+                <div class="container mt-5">
+                    <form asp-controller="FilterController"
+                          asp-action="Index"
+                          method="get"
+                          class="row mb-4">
+
+                        <div class="col-md-6">
+                            <label asp-for="SelectedSkillID" class="form-label">
+                                Skill
+                            </label>
+                            <select asp-for="SelectedSkillID"
+                                    asp-items="Model.SkillOptions"
+                                    class="form-select">
+                                <option value="">-- All Skills --</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">
+                                Apply Filter
+                            </button>
+                        </div>
+                    </form>
+
+                    <h4 class="mb-3">Filtered Resumes</h4>
+                    @if (Model.Resumes?.Any() ?? false)
+                    {
+                        <ul class="list-group">
+                            @foreach (var r in Model.Resumes)
+                            {
+                                <li class="list-group-item">
+                                    <strong>@r.Candidate.CAN_NAME</strong>
+                                    <span class="text-muted">
+                                        (@r.Candidate.CAN_EMAIL)
+                                    </span>
+                                    <br />
+                                    <a href="@r.RESUME_URL" target="_blank">
+                                        View Resume
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No resumes match your selected skill.</p>
+                    }
+                </div>
