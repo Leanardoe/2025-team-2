@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models;
@@ -20,7 +21,8 @@ namespace ResumeSystem.Controllers
 
         // GET: /Filter
         [HttpGet]
-        public async Task<IActionResult> Filtering(int? skillId)
+		[Authorize]
+		public async Task<IActionResult> Filtering(int? skillId)
         {
             // 1) Populate the skills dropdown
             var skillOptions = await context.Skills

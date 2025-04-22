@@ -20,3 +20,8 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.logo {
+    width: 60px;
+    height: auto;
+}

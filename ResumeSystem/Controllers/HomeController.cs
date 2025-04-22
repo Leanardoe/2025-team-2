@@ -12,15 +12,10 @@ namespace ResumeSystem.Controllers
             return View();
         }
 
-        public IActionResult Test() => View();
-
         public IActionResult NavPage()
         {
             // Placeholder: always allow access
             return View();
         }
-
-        [Authorize]
-        public IActionResult Uploading() => View();
     }
 }

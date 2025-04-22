@@ -39,9 +39,12 @@ builder.Services.AddIdentity<User, IdentityRole>()
 builder.Services.ConfigureApplicationCookie(options =>
 {
 	options.LoginPath = "/Account/SignIn"; // This overrides the default
+	options.ExpireTimeSpan = TimeSpan.FromDays(14);
 });
 
 var app = builder.Build();
+
+app.UseStaticFiles();
 
 //create default user
 using (var scope = app.Services.CreateScope())

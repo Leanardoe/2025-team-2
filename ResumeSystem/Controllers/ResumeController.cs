@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using OpenAI;
 using ResumeSystem.Models;
@@ -20,13 +21,15 @@ namespace ResumeSystem.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult Uploading()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Uploading(IFormFile resume, string name, string email)
+		[Authorize]
+		public async Task<IActionResult> Uploading(IFormFile resume, string name, string email)
         {
             try
             {
@@ -58,13 +61,15 @@ namespace ResumeSystem.Controllers
             return View();
         }
 
-        public IActionResult MassUploading()
+		[Authorize]
+		public IActionResult MassUploading()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> MassUploading(List<IFormFile> resumeFiles)
+		[Authorize]
+		public async Task<IActionResult> MassUploading(List<IFormFile> resumeFiles)
         {
 
             foreach (var resumeFile in resumeFiles)
