@@ -212,6 +212,9 @@ namespace ResumeSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateOnly>("UPLOAD_DATE")
+                        .HasColumnType("date");
+
                     b.HasKey("ResumeID");
 
                     b.HasIndex("CandidateID");

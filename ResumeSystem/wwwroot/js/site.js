@@ -25,7 +25,7 @@
             }
         });
 
-        if (filter.length > 0 && hasMatches) {
+        if (filter.length === 0 || (filter.length > 0 && hasMatches)) {
             dropdownMenu.classList.add('show');
         } else {
             dropdownMenu.classList.remove('show');
@@ -49,7 +49,7 @@
             if (!Array.from(selectedSkillsList.children).some(tag => tag.getAttribute('data-id') === value)) {
                 // Create a new tag for the selected skill
                 const skillTag = document.createElement('button');
-                skillTag.className = 'btn btn-outline-secondary';
+                skillTag.className = 'btn btn-outline-success btn-sm-tag';
                 skillTag.textContent = text; // Display the text
                 skillTag.setAttribute('data-id', value); // Store the value in the tag's data-id
 
@@ -65,6 +65,35 @@
                 updateSkillIds(); // Update the hidden input with the new selected skill ID
             }
         });
+    });
+
+    // Hide dropdown when clicking outside of the input or dropdown
+    document.addEventListener('click', function (event) {
+        const isClickInside = searchInput.contains(event.target) || dropdownMenu.contains(event.target);
+        if (!isClickInside) {
+            dropdownMenu.classList.remove('show');
+            searchInput.blur();
+        }
+    });
+
+    searchInput.addEventListener('focus', function () {
+        const filter = searchInput.value.toLowerCase();
+        let hasMatches = false;
+
+        dropdownItems.forEach(item => {
+            const text = item.textContent.toLowerCase();
+            if (text.includes(filter)) {
+                item.style.display = '';
+                hasMatches = true;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        // If nothing is typed, show the dropdown with all items, else show the filtered results
+        if (filter.length === 0 || (filter.length > 0 && hasMatches)) {
+            dropdownMenu.classList.add('show');
+        }
     });
 
     // Update hidden input when form is submitted

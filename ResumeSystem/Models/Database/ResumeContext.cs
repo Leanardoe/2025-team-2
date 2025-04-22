@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ResumeSystem.Models.Database;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 

@@ -20,9 +20,13 @@ namespace ResumeSystem.Models.Database
 		[Required(ErrorMessage = "Resume content is required.")]
 		public string RESUME_STRING { get; set; }
 
+		public DateOnly UPLOAD_DATE { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+
 		//ignore for database stuff for resume search
 		[NotMapped]
         public int Score { get; set; }
+		[NotMapped]
+		public int Match { get; set; } = 100;
 
         public static string ResumeToString(string filePath)
         {

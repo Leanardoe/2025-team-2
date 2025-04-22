@@ -29,7 +29,7 @@ namespace ResumeSystem.Controllers
 
         [HttpPost]
 		[Authorize]
-		public async Task<IActionResult> Uploading(IFormFile resume, string name, string email)
+		public async Task<IActionResult> Uploading(IFormFile resume, string? name, string? email, string? phone)
         {
             try
             {
@@ -43,10 +43,29 @@ namespace ResumeSystem.Controllers
 
                 if (result.Correct)
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(resume.FileName);
-                    FileUpload fileUpload = new FileUpload(_context);
-                    fileUpload.ResumeUpload(fileName, result.Text, result.ResumeBody);
-                    ViewBag.Message = "Resume processed and skills saved successfully.";
+                    if (name != null)
+                    {
+                        Candidate? existingCan = _context.Candidates
+                        .FirstOrDefault(c =>
+                            c.CAN_NAME == name &&
+                            c.CAN_PHONE == phone &&
+                            c.CAN_EMAIL == email);
+                        if (existingCan == null)
+                        {
+                            existingCan = new Candidate() { CAN_NAME = name, CAN_PHONE = phone, CAN_EMAIL = email };
+                        }
+						string fileName = Path.GetFileNameWithoutExtension(resume.FileName);
+						FileUpload fileUpload = new FileUpload(_context);
+						fileUpload.ResumeUpload(fileName, result.Text, result.ResumeBody, existingCan);
+					}
+                    else
+                    {
+						string fileName = Path.GetFileNameWithoutExtension(resume.FileName);
+						FileUpload fileUpload = new FileUpload(_context);
+						fileUpload.ResumeUpload(fileName, result.Text, result.ResumeBody);
+					}
+
+                        ViewBag.Message = "Resume processed and skills saved successfully.";
                 }
                 else
                 {

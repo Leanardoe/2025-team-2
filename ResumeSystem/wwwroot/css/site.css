@@ -43,3 +43,34 @@ body {
     pointer-events: none;
     overflow: hidden;
 }
+
+.progress {
+    background-color: #20242C;
+}
+.btn-sm-custom {
+    padding: 8px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 1rem;
+    min-width: 80px;
+    text-align: center;
+}
+
+.btn-sm-tag {
+    padding: 8px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.td-buttons {
+    text-align: right;
+    align-items: center; /* Ensure vertical alignment */
+    gap: 10px; /* Adjust gap between buttons */
+    width: auto;
+}
+
+td, th {
+    vertical-align: middle; /* Make sure everything is vertically centered */
+}

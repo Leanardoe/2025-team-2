@@ -12,8 +12,8 @@ using ResumeSystem.Models.Database;
 namespace ResumeSystem.Migrations
 {
     [DbContext(typeof(ResumeContext))]
-    [Migration("20250417003723_Identity")]
-    partial class Identity
+    [Migration("20250422150813_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -214,6 +214,9 @@ namespace ResumeSystem.Migrations
                     b.Property<string>("RESUME_URL")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("UPLOAD_DATE")
+                        .HasColumnType("date");
 
                     b.HasKey("ResumeID");
 

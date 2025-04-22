@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ResumeSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class Identity : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -193,7 +193,8 @@ namespace ResumeSystem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CandidateID = table.Column<int>(type: "int", nullable: false),
                     RESUME_URL = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RESUME_STRING = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    RESUME_STRING = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UPLOAD_DATE = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
