@@ -1,6 +1,8 @@
 using OpenAI;
 using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models.Database;
+using Microsoft.AspNetCore.Identity;
+using ResumeSystem.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,11 +25,30 @@ builder.Services.AddSingleton<OpenAIClient>(_ =>
     return new OpenAIClient(apiKey);
 });
 
+builder.Services.Configure<DefaultAdminSettings>(
+	builder.Configuration.GetSection("DefaultAdmin"));
+
 // Add EF Core DI
 builder.Services.AddDbContext<ResumeContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ResumeContext")));
 
+builder.Services.AddIdentity<User, IdentityRole>()
+	.AddEntityFrameworkStores<ResumeContext>()
+	.AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+	options.LoginPath = "/Account/SignIn"; // This overrides the default
+});
+
 var app = builder.Build();
+
+//create default user
+using (var scope = app.Services.CreateScope())
+{
+	var services = scope.ServiceProvider;
+	await IdentitySeeder.SeedDefaultUserAsync(services);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -41,9 +62,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();
-
+//Middleware
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
