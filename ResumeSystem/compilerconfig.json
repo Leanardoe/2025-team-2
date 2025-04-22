@@ -1,0 +1,11 @@
+﻿[
+  {
+    "outputFile": "wwwroot/css/bootstrap-theme.css",
+    "inputFile": "scss/bootstrap-theme.scss",
+    "includePath": "scss",
+    "minify": {
+      "enabled": true
+    },
+    "sourceMap": false
+  }
+]
