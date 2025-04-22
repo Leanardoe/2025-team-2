@@ -11,19 +11,28 @@
             <div class="collapse navbar-collapse" id="nav01">
                 <div class="container mt-5">
                     <form asp-controller="FilterController"
-                          asp-action="Index"
-                          method="get"
-                          class="row mb-4">
+                    asp-action="Index"
+                    method="get"
+                    class="row mb-4">
 
                         <div class="col-md-6">
                             <label asp-for="SelectedSkillID" class="form-label">
                                 Skill
                             </label>
-                            <select asp-for="SelectedSkillID"
-                                    asp-items="Model.SkillOptions"
-                                    class="form-select">
-                                <option value="">-- All Skills --</option>
-                            </select>
+                            <div class="dropdown">
+                                <!-- Searchable Input inside the button (user types here) -->
+                                <input class="form-control dropdown-toggle" type="text" id="searchInput" placeholder="Search skill..." data-bs-toggle="dropdown" aria-expanded="false" autocomplete="off">
+
+                                <!-- Dropdown Menu -->
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <!-- Loop over the Model.SkillOptions to display them dynamically -->
+                                    @foreach (var skill in Model.SkillOptions)
+                                    {
+                                        <li><a class="dropdown-item" href="#" data-value="@skill.Value">@skill.Text</a></li>
+                                    }
+                                </ul>
+
+                            </div>
                         </div>
 
                         <div class="col-md-6 d-flex align-items-end">
@@ -31,6 +40,11 @@
                                 Apply Filter
                             </button>
                         </div>
+                        <!-- Tags will be shown here -->
+                        <div id="selectedSkills" class="mt-2 d-flex flex-wrap gap-2"></div>
+
+                        <!-- Hidden input to collect skill IDs for the form -->
+                        <input type="hidden" name="SelectedSkillIDs" id="skillIdsInput" value="">
                     </form>
 
                     <h4 class="mb-3">Filtered Resumes</h4>
