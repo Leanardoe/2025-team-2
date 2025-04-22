@@ -1,6 +1,8 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchInput');
     const dropdownMenu = document.querySelector('.dropdown-menu'); // <ul class="dropdown-menu">
+    const selectedSkillsList = document.getElementById('selectedSkills');
+    const skillIdsInput = document.getElementById('skillIdsInput');
 
     // Initially, hide the dropdown menu
     dropdownMenu.classList.remove('show');
@@ -30,17 +32,43 @@
         }
     });
 
-    // Add event listener for each dropdown item click
+    function updateSkillIds() {
+        // Join the selected skill IDs array into a comma-separated string
+        skillIdsInput.value = Array.from(selectedSkillsList.querySelectorAll('button')).map(tag => tag.getAttribute('data-id')).join(',');
+    }
+
+    // Add click event for each dropdown item
     dropdownItems.forEach(item => {
         item.addEventListener('click', function (event) {
             event.preventDefault();
 
-            // Get the value and text of the clicked item
             const value = item.getAttribute('data-value');
             const text = item.textContent;
 
-            // Do something with the value and text
-            console.log('Skill selected:', value, text);
+            // Check if the skill is already selected by checking if it exists in the list of tags
+            if (!Array.from(selectedSkillsList.children).some(tag => tag.getAttribute('data-id') === value)) {
+                // Create a new tag for the selected skill
+                const skillTag = document.createElement('button');
+                skillTag.className = 'btn btn-outline-secondary';
+                skillTag.textContent = text; // Display the text
+                skillTag.setAttribute('data-id', value); // Store the value in the tag's data-id
+
+                // Add click event to remove the skill from the list
+                skillTag.addEventListener('click', function () {
+                    // Remove the tag from the UI
+                    selectedSkillsList.removeChild(skillTag);
+                    updateSkillIds(); // Update the hidden input after removal
+                });
+
+                // Append the skill tag to the selected skills list
+                selectedSkillsList.appendChild(skillTag);
+                updateSkillIds(); // Update the hidden input with the new selected skill ID
+            }
         });
+    });
+
+    // Update hidden input when form is submitted
+    document.getElementById('filterForm').addEventListener('submit', function () {
+        updateSkillIds(); // Ensure the selected skill IDs are in the hidden input before submitting
     });
 });
