@@ -5,9 +5,6 @@
 <section>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark-light">
         <div class="container" type="button" aria-controls="nav01" aria-expanded="false">
-            <a class="navbar-brand" href="#">
-                <img class="img-fluid" src="trizzle-assets/logos/trizzle-logo.svg" alt="" />
-            </a>
             <div class="collapse navbar-collapse" id="nav01">
                 <div class="container mt-5">
                     <form asp-controller="FilterController"
@@ -21,7 +18,7 @@
                             </label>
                             <div class="dropdown">
                                 <!-- Searchable Input inside the button (user types here) -->
-                                <input class="form-control dropdown-toggle" type="text" id="searchInput" placeholder="Search skill..." data-bs-toggle="dropdown" aria-expanded="false" autocomplete="off">
+                                <input class="form-control py-3" type="text" id="searchInput" placeholder="Search skill..." data-bs-toggle="dropdown" aria-expanded="false" autocomplete="off">
 
                                 <!-- Dropdown Menu -->
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -46,28 +43,52 @@
                         <!-- Hidden input to collect skill IDs for the form -->
                         <input type="hidden" name="SelectedSkillIDs" id="skillIdsInput" value="">
                     </form>
-
+                    <div class="table-responsive mb-4">
+                        <table class="table table-dark table-striped table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Matching Keywords</th>
+                                    <th class="text-center">Match %</th>
+                                    <th>Submission Date</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var resume in Model.Resumes)
+                                {
+                                    <tr>
+                                        <td>@resume.Candidate.CAN_NAME</td>
+                                        <td>@resume.Candidate.CAN_EMAIL</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                     <h4 class="mb-3">Filtered Resumes</h4>
-                    @if (Model.Resumes?.Any() ?? false)
-                    {
-                        <ul class="list-group">
-                            @foreach (var r in Model.Resumes)
-                            {
-                                <li class="list-group-item">
-                                    <strong>@r.Candidate.CAN_NAME</strong>
-                                    <span class="text-muted">
-                                        (@r.Candidate.CAN_EMAIL)
-                                    </span>
-                                    <br />
-                                    <a href="@r.RESUME_URL" target="_blank">
-                                        View Resume
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p>No resumes match your selected skill.</p>
-                    }
+                    <ul class="list-group w-100">
+                        @if (Model.Resumes?.Any() ?? false)
+                        {
+                        
+                                @foreach (var r in Model.Resumes)
+                                {
+                                    <li class="list-group-item w-100">
+                                        <strong>@r.Candidate.CAN_NAME</strong>
+                                        <span class="text-muted">
+                                            (@r.Candidate.CAN_EMAIL)
+                                        </span>
+                                        <br />
+                                        <a href="@r.RESUME_URL" target="_blank">
+                                            View Resume
+                                        </a>
+                                    </li>
+                                }
+                        
+                        }
+                        else
+                        {
+                            <p>No resumes match your selected skill.</p>
+                        }
+                    </ul>
                 </div>
