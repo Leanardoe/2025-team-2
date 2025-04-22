@@ -4,6 +4,12 @@
     const selectedSkillsList = document.getElementById('selectedSkills');
     const skillIdsInput = document.getElementById('skillIdsInput');
 
+    //HEADER
+    const table = document.querySelector('table');
+    const headers = table.querySelectorAll('th[data-column]');
+    const tbody = table.querySelector('tbody');
+
+
     // Initially, hide the dropdown menu
     dropdownMenu.classList.remove('show');
 
@@ -94,6 +100,50 @@
         if (filter.length === 0 || (filter.length > 0 && hasMatches)) {
             dropdownMenu.classList.add('show');
         }
+    });
+
+    headers.forEach(header => {
+        const arrowSpan = header.querySelector('.sort-arrow');
+        const columnIndex = parseInt(header.getAttribute('data-column'));
+
+        header.addEventListener('click', () => {
+            const currentOrder = header.getAttribute('data-order');
+            const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+            header.setAttribute('data-order', newOrder);
+
+            // Reset all other arrows
+            headers.forEach(h => {
+                const span = h.querySelector('.sort-arrow');
+                if (span) span.textContent = '';
+            });
+
+            // Set new arrow
+            arrowSpan.textContent = newOrder === 'asc' ? '▲' : '▼';
+
+            // Sort rows
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort((a, b) => {
+                let aVal, bVal;
+
+                if (columnIndex === 4) { // Match % column
+                    aVal = parseFloat(a.querySelector('[aria-valuenow]')?.getAttribute('aria-valuenow') || '0');
+                    bVal = parseFloat(b.querySelector('[aria-valuenow]')?.getAttribute('aria-valuenow') || '0');
+                } else {
+                    aVal = a.children[columnIndex].textContent.trim().toLowerCase();
+                    bVal = b.children[columnIndex].textContent.trim().toLowerCase();
+                }
+
+                if (typeof aVal === 'number' && typeof bVal === 'number') {
+                    return newOrder === 'asc' ? aVal - bVal : bVal - aVal;
+                } else {
+                    return newOrder === 'asc'
+                        ? aVal.localeCompare(bVal)
+                        : bVal.localeCompare(aVal);
+                }
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+        });
     });
 
     // Update hidden input when form is submitted

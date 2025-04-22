@@ -42,10 +42,20 @@
                         <table class="table table-dark table-striped table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th class="text-center">Match %</th>
-                                    <th>Submission Date</th>
+                                    <th data-column="0" data-order="desc">Name
+                                        <span class="sort-arrow">&#8203;</span>
+                                    </th>
+                                    <th data-column="1" data-order="desc">Email
+                                        <span class="sort-arrow">&#8203;</span>
+                                    </th>
+                                    <th data-column="4" class="text-center" data-order="desc"
+                                        style="min-width: 50px; width: 120px;">
+                                        Match %
+                                        <span class="sort-arrow">&#8203;</span>
+                                    </th>
+                                    <th data-column="3" data-order="desc">Submission Date
+                                        <span class="sort-arrow">&#8203;</span>
+                                    </th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -61,7 +71,7 @@
                                                 : resume.Match >= 50 ? "bg-warning text-dark"
                                                 : "bg-danger";
                                             }
-                                            <div class="progress">
+                                            <div class="progress" style="width: 80px;">
                                                 <div class="progress-bar @progressClass" role="progressbar"
                                                      style="@($"width: {resume.Match}%")"
                                                      aria-valuenow="@resume.Match" aria-valuemin="0" aria-valuemax="100">
