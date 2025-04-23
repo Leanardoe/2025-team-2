@@ -14,19 +14,19 @@
                 <h2 class="h4 text-white mb-4">Submit Your Resume</h2>
                 <form asp-controller="Resume" asp-action="Uploading" method="post" enctype="multipart/form-data">
                     <div class="position-relative mb-4">
-                        <input class="form-control text-light fs-6 bg-transparent" type="text" name="name" placeholder="Enter a full name..." />
+                        <input class="form-control text-white fs-6 bg-transparent" type="text" name="name" placeholder="Enter a full name..." />
                         <span class="position-absolute top-0 start-0 ms-3 px-1 fs-10 translate-middle-y fw-medium text-secondary-light bg-dark-light">Full Name</span>
                     </div>
                     <div class="position-relative mb-4">
-                        <input class="form-control text-light fs-6 bg-transparent" type="email" name="email" placeholder="Enter a email address..." />
+                        <input class="form-control text-white fs-6 bg-transparent" type="email" name="email" placeholder="Enter a email address..." />
                         <span class="position-absolute top-0 start-0 ms-3 px-1 fs-10 translate-middle-y fw-medium text-secondary-light bg-dark-light">Email Address</span>
                     </div>
                     <div class="position-relative mb-4">
-                        <input class="form-control text-light fs-6 bg-transparent" type="tel" name="phone" placeholder="Enter a phone number..." />
+                        <input class="form-control text-white fs-6 bg-transparent" type="tel" name="phone" placeholder="Enter a phone number..." />
                         <span class="position-absolute top-0 start-0 ms-3 px-1 fs-10 translate-middle-y fw-medium text-secondary-light bg-dark-light">Phone Number</span>
                     </div>
                     <div class="mb-4">
-                        <label class="form-label text-secondary-light fs-10 mb-2">Resume Upload</label>
+                        <label class="form-label text-white fs-10 mb-2">Resume Upload</label>
                         <input type="file" class="form-control bg-transparent text-light" name="resume" accept=".docx,.pdf,.txt" required />
                         <div class="form-text text-secondary-light mt-2">Accepted file formats: .DOCX, .PDF, .TXT</div>
                     </div>
