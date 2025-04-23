@@ -1,12 +1,22 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+
+@{
     ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h2 class="mb-4">Welcome to the Resume Interpreter</h2>
-    <p class="lead">Analyze and extract information from uploaded resumes using AI.</p>
-    <a asp-controller="Home" asp-action="Test" class="btn btn-primary mt-3">
-        Go To Test Page
-    </a>
-    
+<div class="container py-5 text-center">
+    @if (!SignInManager.IsSignedIn(User))
+    {
+        <h2 class="display-5 mb-4">Welcome to the Resume System App</h2>
+        <p class="lead mb-4">Please log in to upload and process resumes using AI.</p>
+        <a asp-controller="Account" asp-action="SignIn" class="btn btn-primary px-4 py-2">Sign In</a>
+    }
+    else
+    {
+        <h2 class="display-5 mb-4">You're Logged In!</h2>
+        <p class="lead mb-4">Ready to upload or manage resumes?</p>
+        <a asp-controller="Resume" asp-action="Uploading" class="btn btn-success px-4 py-2 me-2">Upload Resume</a>
+        <a asp-controller="Filter" asp-action="Filtering" class="btn btn-outline-primary px-4 py-2">View Candidates</a>
+    }
 </div>

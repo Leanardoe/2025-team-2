@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 315 266">
+  <defs>
+    <pattern x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse" viewBox="0 0 100 100" id="pattern-0">
+      <rect x="0" y="0" width="100" height="50" style="fill: black;"/>
+    </pattern>
+    <pattern id="pattern-0-0" href="#pattern-0" patternTransform="matrix(1, 0, 0, 0.791735, 303.152013, 156.343005)"/>
+    <pattern id="pattern-1" href="#pattern-0" patternTransform="matrix(1, 0, 0, 0.791735, 303.152013, 156.343005)"/>
+  </defs>
+  <rect x="0.513" y="58.339" width="107.387" height="172.47" style="fill: rgb(208, 195, 144);" rx="18.223" ry="18.223"/>
+  <g transform="matrix(1, 0, 0, 1, -162.845034, -34.130185)">
+    <rect x="219.981" y="98.577" width="165.311" height="138.627" style="fill-opacity: 0.27;" rx="12.366" ry="12.366"/>
+    <rect x="232.997" y="61.829" width="165.311" height="215.425" style="fill: rgb(209, 79, 79);" rx="12.366" ry="12.366"/>
+    <rect x="250.569" y="74.147" width="130.166" height="189.392" style="fill-opacity: 0.5; fill: url(&quot;#pattern-1&quot;);"/>
+    <g transform="matrix(1.272726, 0, 0, 1.322034, -295.648106, 20.010178)" style="">
+      <rect x="428.897" y="42.955" width="50.114" height="38.399" style="fill: rgb(209, 79, 79);"/>
+      <g>
+        <circle cx="453.628" cy="56.48" r="12" style="fill-opacity: 0.5;" fill="#000000"/>
+        <path d="M 429.628 80.48 C 429.628 70.48 477.628 70.48 477.628 80.48 L 429.628 80.48 Z" style="fill-opacity: 0.5;" fill="#000000"/>
+      </g>
+    </g>
+    <rect x="298.731" y="71.591" width="165.311" height="138.627" style="fill-opacity: 0.27;" rx="12.366" ry="12.366"/>
+  </g>
+  <g transform="matrix(1, 0, 0, 1, -83.443742, -62.224042)">
+    <rect x="232.997" y="61.829" width="165.311" height="215.425" style="fill: rgb(91, 213, 72);" rx="12.366" ry="12.366"/>
+    <rect x="250.569" y="74.147" width="130.166" height="189.392" style="fill: url(&quot;#pattern-0-0&quot;); fill-opacity: 0.5;"/>
+    <g transform="matrix(1.272726, 0, 0, 1.322034, -295.648106, 20.010178)" style="">
+      <rect x="428.897" y="42.955" width="50.114" height="38.399" style="fill: rgb(91, 213, 72);"/>
+      <g>
+        <circle cx="453.628" cy="56.48" r="12" style="fill-opacity: 0.5;" fill="#000000"/>
+        <path d="M 429.628 80.48 C 429.628 70.48 477.628 70.48 477.628 80.48 L 429.628 80.48 Z" style="fill-opacity: 0.5;" fill="#000000"/>
+      </g>
+    </g>
+  </g>
+  <rect x="0.212" y="92.674" width="272.047" height="173.121" style="fill: rgb(243, 229, 171);" rx="24.732" ry="24.732"/>
+  <g transform="matrix(1, 0, 0, 1, 211.519672, -18.115101)">
+    <g transform="matrix(1.272726, 0, 0, 1.322034, -295.648106, 20.010178)" style="">
+      <g/>
+    </g>
+  </g>
+</svg>

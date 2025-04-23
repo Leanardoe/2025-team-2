@@ -1,54 +1,127 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Resume System</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/trizzle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/bootstrap-theme.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
-    <header class="bg-primary text-white py-3">
-        <div class="container text-center">
-            <h1 class="mb-0">Resume Interpreter</h1>
-        </div>
-    </header>
+<body class="bg-dark text-white">
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" asp-controller="Home" asp-action="Index">Home</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Home" asp-action="Test">Test</a>
-                    </li>
-                </ul>
+    <!-- Trizzle-style Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark-light">
+        <div class="container" type="button" aria-controls="nav01" aria-expanded="false">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                <img class="logo" src="~/images/resume-logo.svg" alt="Logo" />
+            </a>
+            <div class="collapse navbar-collapse" id="nav01">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                        <a class="nav-link px-4 d-flex align-items-center" asp-controller="Resume" asp-action="Uploading">
+                            <span class="ms-2">Upload</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-4 d-flex align-items-center" asp-controller="Home" asp-action="MassUploading">
+                            <span class="ms-2">Mass Upload</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-4 d-flex align-items-center" asp-controller="Filter" asp-action="Filtering">
+                            <span class="ms-2">Filtering</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <a class="nav-link px-4 d-flex align-items-center" asp-controller="Account" asp-action="SignOut">
+                                <span class="ms-2">Sign Out</span>
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="nav-link px-4 d-flex align-items-center" asp-controller="Account" asp-action="SignIn">
+                                <span class="ms-2">Sign In</span>
+                            </a>
+                        }
                     </li>
                 </ul>
+                <div class="d-none d-xl-flex align-items-center ms-auto">
+                    <a class="btn border-0 d-flex align-items-center p-0" href="#">
+                        @if (!SignInManager.IsSignedIn(User))
+                        {
+                            <span class="ms-3 me-4 fw-bold text-white">Your Name</span>
+                        }
+                        else
+                        {
+                            <span class="ms-3 me-4 fw-bold text-white">@User.Identity.Name</span>
+                        }
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 6L8 10L12 6" stroke="#3D485B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </a>
+                </div>
             </div>
+            <button class="d-block d-xl-none navbar-burger navbar-toggler py-1 px-2 border-0 rounded-1" type="button" data-bs-toggle="collapse" data-bs-target="#nav01">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <!-- Optional Mobile Menu (Drawer style) -->
+    <div class="d-none navbar-menu position-fixed top-0 start-0 bottom-0 w-100 mw-sm" style="z-index: 9999;">
+        <div class="navbar-close navbar-backdrop position-fixed top-0 start-0 end-0 bottom-0 bg-dark-light bg-opacity-25"></div>
+        <nav class="position-relative h-100 w-100 d-flex flex-column pt-8 pb-10 px-8 bg-dark-light overflow-auto">
+            <div class="d-flex align-items-center justify-content-between mb-16">
+                <a href="#"><img class="img-fluid" src="~/assets/trizzle-logo.svg" alt="Logo" /></a>
+                <a class="navbar-close text-light" href="#">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M4.71 3.29L3.29 4.71 10.59 12 3.29 19.29 4.71 20.71 12 13.41 19.29 20.71 20.71 19.29 13.41 12 20.71 4.71 19.29 3.29 12 10.59z" fill="currentColor" />
+                    </svg>
+                </a>
+            </div>
+            <ul class="list-unstyled mb-10">
+                <li class="mb-10"><a class="btn p-0 btn-link fs-7 text-light" href="#">Overview</a></li>
+                <li class="mb-10"><a class="btn p-0 btn-link fs-7 text-light" href="#">Analytics</a></li>
+                <li class="mb-10"><a class="btn p-0 btn-link fs-7 text-light" href="#">Products</a></li>
+                <li class="mb-10"><a class="btn p-0 btn-link fs-7 text-light" href="#">Orders</a></li>
+                <li><a class="btn p-0 btn-link fs-7 text-light" href="#">Customers</a></li>
+            </ul>
+            <a class="btn mt-auto border-0 d-flex align-items-center p-0" href="#">
+                <img class="img-fluid" src="~/assets/avatar-men.png" alt="Avatar" />
+                <span class="ms-3 me-4 fw-bold text-white">John Doe</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M4 6L8 10L12 6" stroke="#3D485B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </a>
+        </nav>
     </div>
 
-    <footer class="footer bg-light border-top py-3 mt-5">
-        <div class="container text-center">
-            <span class="text-muted">&copy; 2025 - Resume Interpreter System</span>
+    <!-- Main Content -->
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer bg-light text-dark mt-5 py-3 border-top fixed-bottom">
+        <div class="container text-center text-white">
+            &copy; @DateTime.Now.Year - Resume Interpreter System
         </div>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- Scripts -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

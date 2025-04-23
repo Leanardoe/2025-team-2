@@ -1,0 +1,85 @@
+﻿@model ResumeSystem.Models.ResumeFilterViewModel
+@{
+    ViewData["Title"] = "Filter Resumes";
+}
+                <div class="container w-auto mt-5">
+                    <form asp-controller="FilterController"
+                    asp-action="Index"
+                    method="get"
+                    class="row mb-4">
+
+                        <div class="col-md-6">
+                            <div class="dropdown">
+                                <!-- Searchable Input inside the button (user types here) -->
+                                <div class="position-relative">
+                                    <input class="form-control py-3 bg-transparent text-white" type="text" id="searchInput" placeholder="Search skills..." data-bs-toggle="dropdown" aria-expanded="false" autocomplete="off">
+                                     <span class="position-absolute top-0 start-0 ms-3 px-1 fs-8 translate-middle-y fw-medium text-secondary-light bg-dark">Skills</span>
+                                </div>
+                                <!-- Dropdown Menu -->
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <!-- Loop over the Model.SkillOptions to display them dynamically -->
+                                    @foreach (var skill in Model.SkillOptions)
+                                    {
+                                        <li><a class="dropdown-item" href="#" data-value="@skill.Value">@skill.Text</a></li>
+                                    }
+                                </ul>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary">
+                                Apply Filter
+                            </button>
+                        </div>
+                        <!-- Tags will be shown here -->
+                        <div id="selectedSkills" class="mt-2 d-flex flex-wrap gap-2"></div>
+
+                        <!-- Hidden input to collect skill IDs for the form -->
+                        <input type="hidden" name="SelectedSkillIDs" id="skillIdsInput" value="">
+                    </form>
+                    <div class="table-responsive w-auto mb-4">
+                        <table class="table table-dark table-striped table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th class="text-center">Match %</th>
+                                    <th>Submission Date</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var resume in Model.Resumes)
+                                {
+                                    <tr>
+                                        <td>@resume.Candidate.CAN_NAME</td>
+                                        <td>@resume.Candidate.CAN_EMAIL</td>
+                                        <td class="text-center" style="min-width: 50px; width: 100px;">
+                                            @{
+                                                var progressClass = resume.Match >= 80 ? "bg-success"
+                                                : resume.Match >= 50 ? "bg-warning text-dark"
+                                                : "bg-danger";
+                                            }
+                                            <div class="progress">
+                                                <div class="progress-bar @progressClass" role="progressbar"
+                                                     style="@($"width: {resume.Match}%")"
+                                                     aria-valuenow="@resume.Match" aria-valuemin="0" aria-valuemax="100">
+                                                    <strong>@($"{resume.Match}%")</strong>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @resume.UPLOAD_DATE.ToString()
+                                        </td>
+                                        <td class="td-buttons">
+                                            <a class="btn btn-outline-success btn-sm-custom" asp-action="View" asp-controller="Resume" asp-route-id="@resume.ResumeID">View</a>
+                                            <a class="btn btn-outline-danger btn-sm-custom" asp-action="Delete" asp-controller="Resume" asp-route-id="@resume.ResumeID"
+                                            onclick="return confirm('Are you sure you want to delete this resume?');">Delete</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>

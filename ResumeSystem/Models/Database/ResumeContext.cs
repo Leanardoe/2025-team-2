@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ResumeSystem.Models.Database;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
 
 namespace ResumeSystem.Models.Database
 {
-    public class ResumeContext : DbContext
+    public class ResumeContext : IdentityDbContext<User>
     {
         public ResumeContext(DbContextOptions<ResumeContext> options) : base(options)
         {
@@ -16,6 +17,8 @@ namespace ResumeSystem.Models.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
 			modelBuilder.Entity<CandidateSkill>()
 		    .HasKey(cs => new { cs.CandidateID, cs.SkillID });
 

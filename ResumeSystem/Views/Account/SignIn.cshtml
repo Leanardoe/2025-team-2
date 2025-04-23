@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Sign In";
+}
+
+<section class="py-5 bg-dark min-vh-100 d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card bg-dark-light border border-light-dark rounded-3 p-4 shadow">
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h2 class="text-white">Sign In</h2>
+                            <p class="text-secondary-light">Enter your credentials to access your account</p>
+                        </div>
+                        <form asp-action="SignIn" method="post">
+                            <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+                            <div class="position-relative mb-4">
+                                <input class="form-control text-white fs-6 bg-transparent" name="username" placeholder="username" required />
+                                <span class="position-absolute top-0 start-0 ms-3 px-1 fs-10 translate-middle-y fw-medium text-secondary-light bg-dark-light">Email address</span>
+                            </div>
+                            <div class="position-relative mb-4">
+                                <input class="form-control text-white fs-6 bg-transparent" type="password" name="password" placeholder="••••••••" required />
+                                <span class="position-absolute top-0 start-0 ms-3 px-1 fs-10 translate-middle-y fw-medium text-secondary-light bg-dark-light">Password</span>
+                            </div>
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="rememberMe" id="rememberMe" />
+                                    <label class="form-check-label" for="rememberMe">
+                                        Remember me
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">Sign In</button>
+                            @* <div class="text-center">
+                                <small class="text-muted">Forgot your password? <a href="#" class="text-primary">Reset it</a></small>
+                            </div> *@
+                        </form>
+                    </div>
+                </div>
+                @* <div class="text-center mt-4">
+                    <small class="text-secondary-light">Don’t have an account? <a href="#" class="text-primary">Sign up</a></small>
+                </div> *@
+            </div>
+        </div>
+    </div>
+</section>
