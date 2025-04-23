@@ -70,7 +70,7 @@ body {
 .td-buttons {
     text-align: right;
     align-items: center; /* Ensure vertical alignment */
-    gap: 10px; /* Adjust gap between buttons */
+    gap: 15px; /* Adjust gap between buttons */
     width: auto;
 }
 

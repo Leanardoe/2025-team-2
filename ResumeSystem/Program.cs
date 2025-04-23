@@ -39,10 +39,19 @@ builder.Services.AddIdentity<User, IdentityRole>()
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-	options.LoginPath = "/Account/SignIn"; // This overrides the default
+	options.LoginPath = "/Account/SignIn";
 	options.ExpireTimeSpan = TimeSpan.FromDays(14);
-});
+	options.SlidingExpiration = true;
 
+	options.Events.OnSigningIn = context =>
+	{
+		if (context.Properties.IsPersistent)
+		{
+			context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(14);
+		}
+		return Task.CompletedTask;
+	};
+});
 var app = builder.Build();
 
 // Migrate database automatically on startup

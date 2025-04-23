@@ -190,7 +190,7 @@ namespace ResumeSystem.Migrations
 
                     b.HasIndex("SkillID");
 
-                    b.ToTable("CandidateSkill");
+                    b.ToTable("CandidateSkills");
                 });
 
             modelBuilder.Entity("ResumeSystem.Models.Database.Resume", b =>

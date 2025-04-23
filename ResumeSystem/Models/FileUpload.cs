@@ -176,7 +176,7 @@ namespace ResumeSystem.Models
 		//determine if any skills in the list already exists in the database
 		private List<Skill> FindSkills(string SkillsInfo, Candidate candidate)
 		{
-			var stringList = SkillsInfo.Split(',').Distinct().Select(str => str.Trim());
+			var stringList = SkillsInfo.Split('␟').Distinct().Select(str => str.Trim());
 
 			List<Skill> skillList = new List<Skill>();
 

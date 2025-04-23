@@ -16,18 +16,11 @@ namespace ResumeSystem.Models
         public User User { get; set; }
 
         [NotMapped]
-        private List<Resume> Resumes { get; set; }
-
-        public void Filter()
-        {
-            //TODO Returns a list of resumes that have the users specified skills and stores it in the private Resumes variable. May do filterAdd and filterRemove to save time.
-
-        }
+        public List<Resume> Resumes { get; set; }
 
         // list<resume>
         public List<Resume> KeywordSearch(List<string> keywords)
         {
-            Resumes = new List<Resume>();
             var newResumes = new List<Resume>();
 
             foreach (var resume in Resumes)
@@ -36,13 +29,15 @@ namespace ResumeSystem.Models
                 var ac = new AhoCorasick(CharComparer.OrdinalIgnoreCase, keywords);
                 var results = ac.Search(resume.RESUME_STRING).ToList();
 
-				resume.Score = ScoreList(results);
-                newResumes.Add(resume);
+                var dictionary = ScoreList(results);
+				resume.Score = ScoreResume(dictionary,10);
+				resume.Match = (dictionary.Count == 0) ? 0 : (int)Math.Floor((dictionary.Count / (double)keywords.Count) * 100.0);
+				newResumes.Add(resume);
 			}
             return newResumes;
 		}
 
-        public int ScoreList(IList<WordMatch> resumeslist)
+        public Dictionary<string,int> ScoreList(IList<WordMatch> resumeslist)
         {
             int lengthStrength = 10;
             var groups = resumeslist
@@ -51,7 +46,7 @@ namespace ResumeSystem.Models
             stuff = s.Key,
             Count = s.Count()
              });
-            return ScoreResume(groups.ToDictionary(g => g.stuff, g => g.Count),lengthStrength);
+            return groups.ToDictionary(g => g.stuff, g => g.Count);
         }
 
         public int ScoreResume(Dictionary<string, int> scores, int mult) 

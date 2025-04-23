@@ -43,6 +43,19 @@
         skillIdsInput.value = Array.from(selectedSkillsList.querySelectorAll('button')).map(tag => tag.getAttribute('data-id')).join(',');
     }
 
+    function updatePersistantSkills() {
+        const skillIdsInput = document.getElementById("skillIdsInput");
+        const selectedSkills = document.querySelectorAll(".persistent-tag");
+
+        // Ensure that only valid tags with data-value are considered
+        const skillIds = Array.from(selectedSkills)
+            .map(tag => tag.getAttribute("data-value"))
+            .filter(value => value); // Filter out any empty values
+
+        // Update the hidden input with the comma-separated skill IDs
+        skillIdsInput.value = skillIds.join(",");
+    }
+
     // Add click event for each dropdown item
     dropdownItems.forEach(item => {
         item.addEventListener('click', function (event) {
@@ -146,8 +159,20 @@
         });
     });
 
+    const skillTags = document.querySelectorAll(".persistent-tag");
+
+    skillTags.forEach(function (skillTag) {
+        skillTag.addEventListener("click", function () {
+            // Remove the tag from the UI
+            skillTag.parentNode.removeChild(skillTag);
+            updateSkillIds(); // Update the hidden input after removal
+        });
+    });
+
     // Update hidden input when form is submitted
     document.getElementById('filterForm').addEventListener('submit', function () {
-        updateSkillIds(); // Ensure the selected skill IDs are in the hidden input before submitting
+        updateSkillIds();// Ensure the selected skill IDs are in the hidden input before submitting
     });
+
+
 });

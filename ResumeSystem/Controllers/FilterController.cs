@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models;
 using ResumeSystem.Models.Database;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ResumeSystem.Controllers
 {
@@ -22,10 +19,22 @@ namespace ResumeSystem.Controllers
         // GET: /Filter
         [HttpGet]
 		[Authorize]
-		public async Task<IActionResult> Filtering(int? skillId)
+		public async Task<IActionResult> Filtering([FromQuery] string SelectedSkillIDs, [FromQuery] string? SearchTerm)
         {
-            // 1) Populate the skills dropdown
-            var skillOptions = await context.Skills
+			// 0) Populate the skills list
+			var skillIds = new List<int>();
+
+			if (!string.IsNullOrWhiteSpace(SelectedSkillIDs))
+			{
+				skillIds = SelectedSkillIDs
+					.Split(',', StringSplitOptions.RemoveEmptyEntries)
+					.Select(id => int.TryParse(id, out var parsed) ? parsed : (int?)null)
+					.Where(id => id.HasValue)
+					.Select(id => id.Value)
+					.ToList();
+			}
+			// 1) Populate the skills dropdown
+			var skillOptions = await context.Skills
                 .OrderBy(s => s.SKILL_NAME)
                 .Select(s => new SelectListItem
                 {
@@ -38,12 +47,14 @@ namespace ResumeSystem.Controllers
             IQueryable<Resume> query = context.Resumes;
 
             // 3) If a skill filter was provided, restrict to resumes whose Candidate has that skill
-            if (skillId.HasValue && skillId.Value > 0)
+            if (skillIds.Count > 0)
             {
-                query = query.Where(r =>
-                    r.Candidate.CandidateSkills.Any(cs => cs.SkillID == skillId.Value) // Ensure CandidateSkills collection is used
+				query = query.Where(r =>
+	                skillIds.All(id =>
+		                r.Candidate.CandidateSkills.Any(cs => cs.SkillID == id)
+	                )
                 );
-            }
+			}
 
             // 4) Then eager-load Candidate and their Skills (CandidateSkills)
             query = query
@@ -55,15 +66,64 @@ namespace ResumeSystem.Controllers
             // 5) Execute the query
             var resumes = await query.ToListAsync();
 
+
+            // 6) search resumes
+            var qs = new QuerySearch() { Resumes = resumes };
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
+            {
+                List<string> searchKeywords = SearchTerm
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim())
+                    .ToList();
+
+                var searchedResumes = qs.KeywordSearch(searchKeywords);
+
+                if (searchedResumes.Count > 0)
+                {
+                    resumes = searchedResumes.OrderByDescending(r => r.Score).ToList(); ;
+                }
+            }
+
             // 6) Build and return the view‑model
             var vm = new ResumeFilterViewModel
             {
-                SelectedSkillID = skillId,
+                SelectedSkillIDs = skillIds,
                 SkillOptions = skillOptions,
+                SearchTerm = SearchTerm,
                 Resumes = resumes
             };
 
             return View(vm);
         }
-    }
+
+		public IActionResult Delete(int id)
+        {
+			var candidate = context.Candidates
+	            .Include(c => c.CandidateSkills)
+	            .FirstOrDefault(c => c.CandidateID == id);
+
+			if (candidate != null)
+			{
+				context.Candidates.Remove(candidate);
+				context.SaveChanges();
+
+				// Get all SkillIDs that are *not* referenced in CandidateSkills anymore
+				var orphanedSkillIds = context.Skills
+					.Where(s => !context.CandidateSkills.Any(cs => cs.SkillID == s.SkillID))
+					.Select(s => s.SkillID)
+					.ToList();
+
+				// Remove those skills
+				var orphanedSkills = context.Skills
+					.Where(s => orphanedSkillIds.Contains(s.SkillID))
+					.ToList();
+
+				context.Skills.RemoveRange(orphanedSkills);
+
+				context.SaveChanges();
+			}
+
+			return RedirectToAction("Filtering");
+        }
+	}
 }
