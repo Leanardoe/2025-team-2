@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ResumeSystem.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Final : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -208,7 +208,7 @@ namespace ResumeSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CandidateSkill",
+                name: "CandidateSkills",
                 columns: table => new
                 {
                     CandidateID = table.Column<int>(type: "int", nullable: false),
@@ -216,15 +216,15 @@ namespace ResumeSystem.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CandidateSkill", x => new { x.CandidateID, x.SkillID });
+                    table.PrimaryKey("PK_CandidateSkills", x => new { x.CandidateID, x.SkillID });
                     table.ForeignKey(
-                        name: "FK_CandidateSkill_Candidates_CandidateID",
+                        name: "FK_CandidateSkills_Candidates_CandidateID",
                         column: x => x.CandidateID,
                         principalTable: "Candidates",
                         principalColumn: "CandidateID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CandidateSkill_Skills_SkillID",
+                        name: "FK_CandidateSkills_Skills_SkillID",
                         column: x => x.SkillID,
                         principalTable: "Skills",
                         principalColumn: "SkillID",
@@ -271,8 +271,8 @@ namespace ResumeSystem.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CandidateSkill_SkillID",
-                table: "CandidateSkill",
+                name: "IX_CandidateSkills_SkillID",
+                table: "CandidateSkills",
                 column: "SkillID");
 
             migrationBuilder.CreateIndex(
@@ -300,7 +300,7 @@ namespace ResumeSystem.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "CandidateSkill");
+                name: "CandidateSkills");
 
             migrationBuilder.DropTable(
                 name: "Resumes");

@@ -3,17 +3,14 @@
     ViewData["Title"] = "Filter Resumes";
 }
                 <div class="container w-auto mt-5">
-                    <form asp-controller="FilterController"
-                    asp-action="Index"
-                    method="get"
+                    <form asp-controller="Filter" asp-action="Filtering" method="get"
                     class="row mb-4">
-
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="dropdown">
                                 <!-- Searchable Input inside the button (user types here) -->
                                 <div class="position-relative">
                                     <input class="form-control py-3 bg-transparent text-white" type="text" id="searchInput" placeholder="Search skills..." data-bs-toggle="dropdown" aria-expanded="false" autocomplete="off">
-                                     <span class="position-absolute top-0 start-0 ms-3 px-1 fs-8 translate-middle-y fw-medium text-secondary-light bg-dark">Skills</span>
+                                    <span class="position-absolute top-0 start-0 ms-3 px-1 fs-8 translate-middle-y fw-medium text-secondary-light bg-dark">Skills</span>
                                 </div>
                                 <!-- Dropdown Menu -->
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -26,26 +23,52 @@
 
                             </div>
                         </div>
-
-                        <div class="col-md-6 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary">
+                        <div class="col-md-6">
+                            <div class="position-relative">
+                                <input class="form-control py-3 bg-transparent text-white" name="SearchTerm" value="@Model.SearchTerm" placeholder="Search resumes..." />
+                                <span class="position-absolute top-0 start-0 ms-3 px-1 fs-8 translate-middle-y fw-medium text-secondary-light bg-dark">Keyword Search</span>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary py-3 h-100 w-100">
                                 Apply Filter
                             </button>
                         </div>
                         <!-- Tags will be shown here -->
-                        <div id="selectedSkills" class="mt-2 d-flex flex-wrap gap-2"></div>
+                        <div id="selectedSkills" class="mt-2 d-flex flex-wrap gap-2">
+                            @foreach (var skillId in Model.SelectedSkillIDs)
+                            {
+                                var skill = Model.SkillOptions.FirstOrDefault(s => s.Value == skillId.ToString());
+                                if (skill != null)
+                                {
+                                    <button class="btn btn-sm-tag btn-outline-info persistent-tag" data-id="@skill.Value">
+                                        @skill.Text
+                                    </button>
+                                }
+                            }
+                        </div>
 
                         <!-- Hidden input to collect skill IDs for the form -->
-                        <input type="hidden" name="SelectedSkillIDs" id="skillIdsInput" value="">
+                        <input type="hidden" name="SelectedSkillIDs" id="skillIdsInput" value="@string.Join(",", Model.SelectedSkillIDs)">
                     </form>
                     <div class="table-responsive w-auto mb-4">
                         <table class="table table-dark table-striped table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th class="text-center">Match %</th>
-                                    <th>Submission Date</th>
+                                    <th data-column="0" data-order="desc">Name
+                                        <span class="sort-arrow">&#8203;</span>
+                                    </th>
+                                    <th data-column="1" data-order="desc">Email
+                                        <span class="sort-arrow">&#8203;</span>
+                                    </th>
+                                    <th data-column="4" class="text-center" data-order="desc"
+                                        style="min-width: 50px; width: 120px;">
+                                        Match %
+                                        <span class="sort-arrow">&#8203;</span>
+                                    </th>
+                                    <th data-column="3" data-order="desc">Submission Date
+                                        <span class="sort-arrow">&#8203;</span>
+                                    </th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -61,10 +84,12 @@
                                                 : resume.Match >= 50 ? "bg-warning text-dark"
                                                 : "bg-danger";
                                             }
-                                            <div class="progress">
+                                            <div class="progress position-relative" style="width: 80px; height: 24px;">
                                                 <div class="progress-bar @progressClass" role="progressbar"
                                                      style="@($"width: {resume.Match}%")"
                                                      aria-valuenow="@resume.Match" aria-valuemin="0" aria-valuemax="100">
+                                                </div>
+                                                <div class="position-absolute w-100 text-center" style="top: 0; line-height: 24px;">
                                                     <strong>@($"{resume.Match}%")</strong>
                                                 </div>
                                             </div>
@@ -73,8 +98,8 @@
                                             @resume.UPLOAD_DATE.ToString()
                                         </td>
                                         <td class="td-buttons">
-                                            <a class="btn btn-outline-success btn-sm-custom" asp-action="View" asp-controller="Resume" asp-route-id="@resume.ResumeID">View</a>
-                                            <a class="btn btn-outline-danger btn-sm-custom" asp-action="Delete" asp-controller="Resume" asp-route-id="@resume.ResumeID"
+                                            <a class="btn btn-outline-success btn-sm-custom" asp-action="Download" asp-controller="Filter" asp-route-id="@resume.ResumeID">Download</a>
+                                            <a class="btn btn-outline-danger btn-sm-custom" asp-action="Delete" asp-controller="Filter" asp-route-id="@resume.ResumeID"
                                             onclick="return confirm('Are you sure you want to delete this resume?');">Delete</a>
                                         </td>
                                     </tr>

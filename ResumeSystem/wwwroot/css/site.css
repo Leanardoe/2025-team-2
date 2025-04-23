@@ -22,12 +22,15 @@ body {
 }
 
 .logo {
-    width: 60px;
-    height: auto;
+    display: block;
+    height: 50px;
+    width: auto;
+    margin: 0;
+    padding: 0;
 }
 
 .dropdown-menu {
-    max-height: 200px; /* Adjust this based on how tall you want the dropdown */
+    max-height: 300px; /* Adjust this based on how tall you want the dropdown */
     overflow-y: auto; /* Enable scroll if there are many options */
 }
 
@@ -67,10 +70,20 @@ body {
 .td-buttons {
     text-align: right;
     align-items: center; /* Ensure vertical alignment */
-    gap: 10px; /* Adjust gap between buttons */
+    gap: 15px; /* Adjust gap between buttons */
     width: auto;
 }
 
 td, th {
     vertical-align: middle; /* Make sure everything is vertically centered */
+}
+
+th {
+    cursor: pointer;
+}
+
+.sort-arrow {
+    display: inline-block;
+    width: 1em; /* enough space for one arrow */
+    text-align: center;
 }

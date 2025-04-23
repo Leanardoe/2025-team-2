@@ -4,6 +4,12 @@
     const selectedSkillsList = document.getElementById('selectedSkills');
     const skillIdsInput = document.getElementById('skillIdsInput');
 
+    //HEADER
+    const table = document.querySelector('table');
+    const headers = table.querySelectorAll('th[data-column]');
+    const tbody = table.querySelector('tbody');
+
+
     // Initially, hide the dropdown menu
     dropdownMenu.classList.remove('show');
 
@@ -35,6 +41,19 @@
     function updateSkillIds() {
         // Join the selected skill IDs array into a comma-separated string
         skillIdsInput.value = Array.from(selectedSkillsList.querySelectorAll('button')).map(tag => tag.getAttribute('data-id')).join(',');
+    }
+
+    function updatePersistantSkills() {
+        const skillIdsInput = document.getElementById("skillIdsInput");
+        const selectedSkills = document.querySelectorAll(".persistent-tag");
+
+        // Ensure that only valid tags with data-value are considered
+        const skillIds = Array.from(selectedSkills)
+            .map(tag => tag.getAttribute("data-value"))
+            .filter(value => value); // Filter out any empty values
+
+        // Update the hidden input with the comma-separated skill IDs
+        skillIdsInput.value = skillIds.join(",");
     }
 
     // Add click event for each dropdown item
@@ -96,8 +115,64 @@
         }
     });
 
+    headers.forEach(header => {
+        const arrowSpan = header.querySelector('.sort-arrow');
+        const columnIndex = parseInt(header.getAttribute('data-column'));
+
+        header.addEventListener('click', () => {
+            const currentOrder = header.getAttribute('data-order');
+            const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+            header.setAttribute('data-order', newOrder);
+
+            // Reset all other arrows
+            headers.forEach(h => {
+                const span = h.querySelector('.sort-arrow');
+                if (span) span.textContent = '';
+            });
+
+            // Set new arrow
+            arrowSpan.textContent = newOrder === 'asc' ? '▲' : '▼';
+
+            // Sort rows
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort((a, b) => {
+                let aVal, bVal;
+
+                if (columnIndex === 4) { // Match % column
+                    aVal = parseFloat(a.querySelector('[aria-valuenow]')?.getAttribute('aria-valuenow') || '0');
+                    bVal = parseFloat(b.querySelector('[aria-valuenow]')?.getAttribute('aria-valuenow') || '0');
+                } else {
+                    aVal = a.children[columnIndex].textContent.trim().toLowerCase();
+                    bVal = b.children[columnIndex].textContent.trim().toLowerCase();
+                }
+
+                if (typeof aVal === 'number' && typeof bVal === 'number') {
+                    return newOrder === 'asc' ? aVal - bVal : bVal - aVal;
+                } else {
+                    return newOrder === 'asc'
+                        ? aVal.localeCompare(bVal)
+                        : bVal.localeCompare(aVal);
+                }
+            });
+
+            rows.forEach(row => tbody.appendChild(row));
+        });
+    });
+
+    const skillTags = document.querySelectorAll(".persistent-tag");
+
+    skillTags.forEach(function (skillTag) {
+        skillTag.addEventListener("click", function () {
+            // Remove the tag from the UI
+            skillTag.parentNode.removeChild(skillTag);
+            updateSkillIds(); // Update the hidden input after removal
+        });
+    });
+
     // Update hidden input when form is submitted
     document.getElementById('filterForm').addEventListener('submit', function () {
-        updateSkillIds(); // Ensure the selected skill IDs are in the hidden input before submitting
+        updateSkillIds();// Ensure the selected skill IDs are in the hidden input before submitting
     });
+
+
 });

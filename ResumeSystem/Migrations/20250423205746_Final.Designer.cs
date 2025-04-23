@@ -12,8 +12,8 @@ using ResumeSystem.Models.Database;
 namespace ResumeSystem.Migrations
 {
     [DbContext(typeof(ResumeContext))]
-    [Migration("20250422150813_Initial")]
-    partial class Initial
+    [Migration("20250423205746_Final")]
+    partial class Final
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -193,7 +193,7 @@ namespace ResumeSystem.Migrations
 
                     b.HasIndex("SkillID");
 
-                    b.ToTable("CandidateSkill");
+                    b.ToTable("CandidateSkills");
                 });
 
             modelBuilder.Entity("ResumeSystem.Models.Database.Resume", b =>
