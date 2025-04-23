@@ -49,7 +49,7 @@
             if (!Array.from(selectedSkillsList.children).some(tag => tag.getAttribute('data-id') === value)) {
                 // Create a new tag for the selected skill
                 const skillTag = document.createElement('button');
-                skillTag.className = 'btn btn-outline-success btn-sm-tag';
+                skillTag.className = 'btn btn-outline-info btn-sm-tag';
                 skillTag.textContent = text; // Display the text
                 skillTag.setAttribute('data-id', value); // Store the value in the tag's data-id
 

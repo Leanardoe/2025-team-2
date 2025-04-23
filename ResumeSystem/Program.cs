@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models.Database;
 using Microsoft.AspNetCore.Identity;
 using ResumeSystem.Models;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,13 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 var app = builder.Build();
+
+// Migrate database automatically on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ResumeContext>();
+    db.Database.Migrate(); // Ensures DB is created & schema is up-to-date
+}
 
 app.UseStaticFiles();
 
