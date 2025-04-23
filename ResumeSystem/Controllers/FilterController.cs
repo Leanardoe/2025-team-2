@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models;
 using ResumeSystem.Models.Database;
+using System.Text;
 
 namespace ResumeSystem.Controllers
 {
@@ -21,6 +22,7 @@ namespace ResumeSystem.Controllers
 		[Authorize]
 		public async Task<IActionResult> Filtering([FromQuery] string SelectedSkillIDs, [FromQuery] string? SearchTerm)
         {
+            
 			// 0) Populate the skills list
 			var skillIds = new List<int>();
 
@@ -71,7 +73,8 @@ namespace ResumeSystem.Controllers
             var qs = new QuerySearch() { Resumes = resumes };
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
-                List<string> searchKeywords = SearchTerm
+				SearchTerm = SearchTerm.Normalize(NormalizationForm.FormC);
+				List<string> searchKeywords = SearchTerm
                     .Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(s => s.Trim())
                     .ToList();

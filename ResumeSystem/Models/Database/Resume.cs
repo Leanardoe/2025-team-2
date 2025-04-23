@@ -37,7 +37,7 @@ namespace ResumeSystem.Models.Database
 			try
 			{
 				//file to string
-				return File.ReadAllText(filePath, Encoding.UTF8);
+				return File.ReadAllText(filePath, Encoding.UTF8).Normalize(NormalizationForm.FormC);
 			}
 			catch (Exception ex)
 			{
