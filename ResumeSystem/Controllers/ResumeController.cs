@@ -65,7 +65,7 @@ namespace ResumeSystem.Controllers
 						fileUpload.ResumeUpload(fileName, result.Text, result.ResumeBody);
 					}
 
-                        ViewBag.Message = "Resume processed and skills saved successfully.";
+                    ViewBag.UploadMSG = "Resume processed and skills saved successfully.";
                 }
                 else
                 {
@@ -80,38 +80,55 @@ namespace ResumeSystem.Controllers
             return View();
         }
 
-		[Authorize]
-		public IActionResult MassUploading()
+        [HttpGet]
+        [Authorize]
+        public IActionResult MassUploading()
         {
-            return View();
+            return Redirect(Url.Action("Uploading", "Resume") + "#multiUpload");
         }
 
-        [HttpPost]
+		[HttpPost]
 		[Authorize]
-		public async Task<IActionResult> MassUploading(List<IFormFile> resumeFiles)
-        {
+		public async Task<IActionResult> MassUploading(List<IFormFile> resumes)
+		{
+			if (resumes == null || !resumes.Any())
+			{
+				ViewBag.Error = "No file uploaded.";
+				return View();
+			}
 
-            foreach (var resumeFile in resumeFiles)
-            {
-                if (resumeFile == null || resumeFile.Length == 0) continue;
-
-                var result = await AIProcess.ProcessResumeAsync(resumeFile, _prompt, _client);
-
-                if (result.Correct)
+			var tasks = resumes.Select(async resume =>
+			{
+				var result = await AIProcess.ProcessResumeAsync(resume, _prompt, _client);
+				return new { File = resume, Result = result };
+			});
+            int i = 0;
+			var processed = await Task.WhenAll(tasks);
+			FileUpload fileUpload = new FileUpload(_context);
+			// Now you can loop through and use both file and result:
+			foreach (var item in processed)
+			{
+				if (item.Result.Correct)
+				{
+					string fileName = Path.GetFileNameWithoutExtension(item.File.FileName);
+					fileUpload.ResumeUpload(fileName, item.Result.Text, item.Result.ResumeBody);
+                    i++;
+				}
+                else
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(resumeFile.FileName);
-                    FileUpload fileUpload = new FileUpload(_context);
-                    fileUpload.ResumeUpload(fileName, result.Text, result.ResumeBody);
-                }
+                    ViewBag.ErrorMSG = 0;
+				}
+			}
+
+            ViewBag.MassUploadMSG = $"Processed {i} Resumes";
+            if (i == 0)
+            {
+                ViewBag.ErrorMSG = 1;
+                ViewBag.MassUploadMSG = "Failed to Process Resumes";
             }
+            
 
-            ViewBag.Message = "All resumes processed.";
-            return View();
-        }
-
-        public IActionResult Filtering()
-        {
-            return View();
-        }
+			return Redirect(Url.Action("Uploading", "Resume") + "#multiUpload");
+		}
     }
 }
