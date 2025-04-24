@@ -1,14 +1,24 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Resume Upload";
     string multi_col = "success";
-    if (ViewBag.ErrorMSG == 0)
+    var errorMsg = TempData["ErrorMSG"] as string ?? "0";
+
+    if (errorMsg == "1")
     {
         multi_col = "warning";
     }
-    else if (ViewBag.ErrorMSG == 1)
+    else if (errorMsg == "2")
     {
         multi_col = "danger";
+    }
+
+    string? msg = ViewBag.UploadMSG;
+    string single_col = "success";
+
+    if (ViewBag.Error != null)
+    {
+        single_col = "danger";
+        msg = ViewBag.Error;
     }
 }
 <section class="container py-5 mb-16" id="singleUpload">
@@ -18,6 +28,12 @@
                 <h1 class="display-4 text-white">Resume Upload</h1>
                 <p class="text-secondary-light">Please upload a resume in .DOCX, .PDF, or .TXT format.</p>
             </div>
+            @if (msg != null)
+            {
+                <div class="bg-@single_col p-4 p-md-5 my-5 rounded-4 border border-light-dark shadow-sm text-center">
+                    <h6>@msg</h6>
+                </div>
+            }
             <div class="bg-dark-light p-4 p-md-5 rounded-4 border border-light-dark shadow-sm">
                 <h3 class="h4 text-white mb-4">Upload Single Resume</h3>
                 <form asp-controller="Resume" asp-action="Uploading" method="post" enctype="multipart/form-data">
@@ -49,9 +65,10 @@
 <section class="container py-5" id="multiUpload">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            @if (ViewBag.MassUploadMSG != null) {
-                <div class="bg-success-@multi_col p-4 p-md-5 rounded-4 border border-light-dark shadow-sm">
-                    <h3>@ViewBag.MassUploadMSG</h3>
+            @if (TempData["MassUploadMSG"] != null)
+            {
+                <div class="bg-@multi_col p-4 p-md-5 my-5 rounded-4 border border-light-dark shadow-sm text-center">
+                    <h6>@TempData["MassUploadMSG"]</h6>
                 </div>
             }
             <div class="bg-dark-light p-4 p-md-5 rounded-4 border border-light-dark shadow-sm">
@@ -59,7 +76,7 @@
                 <form asp-controller="Resume" asp-action="MassUploading" method="post" enctype="multipart/form-data">
                     <div class="mb-4">
                         <label class="form-label text-white fs-10 mb-2">Resume Upload</label>
-                        <input type="file" class="form-control bg-transparent text-white" name="resume" accept=".docx,.pdf,.txt" multiple required />
+                        <input type="file" class="form-control bg-transparent text-white" name="resumes" accept=".docx,.pdf,.txt" multiple required />
                         <div class="form-text text-secondary-light mt-2">Accepted file formats: .DOCX, .PDF, .TXT</div>
                     </div>
                     <div class="text-center mt-5">

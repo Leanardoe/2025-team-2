@@ -236,7 +236,7 @@ namespace ResumeSystem.Models
 				using (WordprocessingDocument doc = WordprocessingDocument.Open(filePath, false))
 				{
 					var body = doc.MainDocumentPart.Document.Body;
-					sb.Append(body.InnerText);
+					sb.Append(body.InnerText + " ");
 				}
 				return sb.ToString();
 			}

@@ -73,7 +73,13 @@ namespace ResumeSystem.Controllers
             var qs = new QuerySearch() { Resumes = resumes };
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
-				SearchTerm = SearchTerm.Normalize(NormalizationForm.FormC);
+				SearchTerm = SearchTerm.Normalize(NormalizationForm.FormC).Trim();
+
+				// If the last character after trimming is a comma, remove it
+				if (SearchTerm.EndsWith(","))
+				{
+					SearchTerm = SearchTerm.Substring(0, SearchTerm.Length - 1).TrimEnd();
+				}
 				List<string> searchKeywords = SearchTerm
                     .Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(s => s.Trim())
@@ -99,30 +105,43 @@ namespace ResumeSystem.Controllers
             return View(vm);
         }
 
+		[Authorize]
 		public IActionResult Delete(int id)
         {
-			var candidate = context.Candidates
-	            .Include(c => c.CandidateSkills)
-	            .FirstOrDefault(c => c.CandidateID == id);
+			// 1. Find the resume to delete
+			var resume = context.Resumes
+				.Include(r => r.Candidate)
+				.FirstOrDefault(r => r.ResumeID == id);
 
-			if (candidate != null)
+			if (resume != null)
 			{
-				context.Candidates.Remove(candidate);
+				var candidate = resume.Candidate;
+
+				// 2. Delete the resume
+				context.Resumes.Remove(resume);
 				context.SaveChanges();
 
-				// Get all SkillIDs that are *not* referenced in CandidateSkills anymore
+				// 3. Check if the candidate has any resumes left
+				bool hasOtherResumes = context.Resumes.Any(r => r.CandidateID == candidate.CandidateID);
+
+				if (!hasOtherResumes)
+				{
+					// Remove candidate
+					context.Candidates.Remove(candidate);
+					context.SaveChanges();
+				}
+
+				// 4. Cleanup orphaned skills
 				var orphanedSkillIds = context.Skills
 					.Where(s => !context.CandidateSkills.Any(cs => cs.SkillID == s.SkillID))
 					.Select(s => s.SkillID)
 					.ToList();
 
-				// Remove those skills
 				var orphanedSkills = context.Skills
 					.Where(s => orphanedSkillIds.Contains(s.SkillID))
 					.ToList();
 
 				context.Skills.RemoveRange(orphanedSkills);
-
 				context.SaveChanges();
 			}
 

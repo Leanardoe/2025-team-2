@@ -55,17 +55,13 @@
                 </ul>
                 <div class="d-none d-xl-flex align-items-center ms-auto">
                     <a class="btn border-0 d-flex align-items-center p-0" href="#">
-                        @if (!SignInManager.IsSignedIn(User))
-                        {
-                            <span class="ms-3 me-4 fw-bold text-white">Your Name</span>
-                        }
-                        else
+                        @if (SignInManager.IsSignedIn(User))
                         {
                             <span class="ms-3 me-4 fw-bold text-white">@User.Identity.Name</span>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 6L8 10L12 6" stroke="#3D485B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
                         }
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M4 6L8 10L12 6" stroke="#3D485B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
                     </a>
                 </div>
             </div>

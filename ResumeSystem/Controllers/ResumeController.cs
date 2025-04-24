@@ -84,8 +84,8 @@ namespace ResumeSystem.Controllers
         [Authorize]
         public IActionResult MassUploading()
         {
-            return Redirect(Url.Action("Uploading", "Resume") + "#multiUpload");
-        }
+			return Redirect(Url.Action("Uploading", "Resume") + "#multiUpload");
+		}
 
 		[HttpPost]
 		[Authorize]
@@ -93,8 +93,9 @@ namespace ResumeSystem.Controllers
 		{
 			if (resumes == null || !resumes.Any())
 			{
-				ViewBag.Error = "No file uploaded.";
-				return View();
+				TempData["ErrorMSG"] = 2;
+				TempData["MassUploadMSG"] = "Failed to Process Resumes";
+				return Redirect(Url.Action("Uploading", "Resume") + "#multiUpload");
 			}
 
 			var tasks = resumes.Select(async resume =>
@@ -116,17 +117,21 @@ namespace ResumeSystem.Controllers
 				}
                 else
                 {
-                    ViewBag.ErrorMSG = 0;
+					TempData["ErrorMSG"] = 0;
 				}
 			}
 
-            ViewBag.MassUploadMSG = $"Processed {i} Resumes";
-            if (i == 0)
-            {
-                ViewBag.ErrorMSG = 1;
-                ViewBag.MassUploadMSG = "Failed to Process Resumes";
-            }
-            
+			TempData["MassUploadMSG"] = $"Processed {i} Resumes";
+			if (i == 0)
+			{
+				TempData["ErrorMSG"] = 1;
+				TempData["MassUploadMSG"] = "Failed to Process Resumes";
+			}
+			else
+			{
+				TempData["ErrorMSG"] = 0;
+			}
+
 
 			return Redirect(Url.Action("Uploading", "Resume") + "#multiUpload");
 		}
