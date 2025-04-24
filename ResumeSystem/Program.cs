@@ -7,6 +7,9 @@ using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Console.WriteLine("🔧 CONNECTION STRING => " + builder.Configuration.GetConnectionString("ResumeContext"));
+
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
