@@ -35,7 +35,7 @@ namespace ResumeSystem.Models
                         new Message(Role.System, "You are a resume skill extractor."),
                         new Message(Role.User, fullPrompt)
                     },
-                    model: "gpt-3.5-turbo",
+                    model: "gpt-4o",
                     temperature: 0.4,
                     maxTokens: 500
                 );
