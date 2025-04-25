@@ -12,7 +12,9 @@ namespace ResumeSystem.Services
         public BlobService(IConfiguration config)
         {
             _config = config;
-            _blobServiceClient = new BlobServiceClient(_config["AzureStorage:ConnectionString"]);
+            string connectionString = _config.GetConnectionString("AzureStorage");
+
+            _blobServiceClient = new BlobServiceClient(connectionString);
         }
 
         // Upload a resume and return the blob name
