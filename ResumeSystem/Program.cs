@@ -4,6 +4,7 @@ using ResumeSystem.Models.Database;
 using Microsoft.AspNetCore.Identity;
 using ResumeSystem.Models;
 using System;
+using ResumeSystem.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,9 @@ Console.WriteLine("🔧 CONNECTION STRING => " + builder.Configuration.GetConnec
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//blob
+builder.Services.AddSingleton<BlobService>();
 
 // Enable session services
 builder.Services.AddDistributedMemoryCache(); // Required for session

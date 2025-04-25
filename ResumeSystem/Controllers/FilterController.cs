@@ -5,16 +5,20 @@ using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models;
 using ResumeSystem.Models.Database;
 using System.Text;
+using Azure.Storage.Blobs;
+using ResumeSystem.Services;
 
 namespace ResumeSystem.Controllers
 {
     public class FilterController : Controller
     {
         private readonly ResumeContext context;
+        private readonly BlobService _blobService;
 
-        public FilterController(ResumeContext ctx)
+        public FilterController(ResumeContext ctx, BlobService blobService)
         {
             context = ctx;
+            _blobService = blobService;
         }
 
         // GET: /Filter
@@ -105,47 +109,87 @@ namespace ResumeSystem.Controllers
             return View(vm);
         }
 
-		[Authorize]
-		public IActionResult Delete(int id)
+        [Authorize]
+        public async Task<IActionResult> Delete(int id)
         {
-			// 1. Find the resume to delete
-			var resume = context.Resumes
-				.Include(r => r.Candidate)
-				.FirstOrDefault(r => r.ResumeID == id);
+            // 1. Find the resume to delete
+            var resume = context.Resumes
+                .Include(r => r.Candidate)
+                .FirstOrDefault(r => r.ResumeID == id);
 
-			if (resume != null)
-			{
-				var candidate = resume.Candidate;
+            if (resume != null)
+            {
+                var candidate = resume.Candidate;
 
-				// 2. Delete the resume
-				context.Resumes.Remove(resume);
-				context.SaveChanges();
+                // Attempt to delete the blob from Azure Storage
+                try
+                {
+                    Uri blobUri = new Uri(resume.RESUME_URL);
+                    string containerName = blobUri.Segments[1].TrimEnd('/');
+                    string blobName = string.Join("", blobUri.Segments.Skip(2));
 
-				// 3. Check if the candidate has any resumes left
-				bool hasOtherResumes = context.Resumes.Any(r => r.CandidateID == candidate.CandidateID);
+                    await _blobService.DeleteResumeAsync(containerName, blobName);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to delete blob: {ex.Message}");
+                }
 
-				if (!hasOtherResumes)
-				{
-					// Remove candidate
-					context.Candidates.Remove(candidate);
-					context.SaveChanges();
-				}
+                // 2. Delete the resume
+                context.Resumes.Remove(resume);
+                context.SaveChanges();
 
-				// 4. Cleanup orphaned skills
-				var orphanedSkillIds = context.Skills
-					.Where(s => !context.CandidateSkills.Any(cs => cs.SkillID == s.SkillID))
-					.Select(s => s.SkillID)
-					.ToList();
+                // 3. Check if the candidate has any resumes left
+                bool hasOtherResumes = context.Resumes.Any(r => r.CandidateID == candidate.CandidateID);
 
-				var orphanedSkills = context.Skills
-					.Where(s => orphanedSkillIds.Contains(s.SkillID))
-					.ToList();
+                if (!hasOtherResumes)
+                {
+                    // Remove candidate
+                    context.Candidates.Remove(candidate);
+                    context.SaveChanges();
+                }
 
-				context.Skills.RemoveRange(orphanedSkills);
-				context.SaveChanges();
-			}
+                // 4. Cleanup orphaned skills
+                var orphanedSkillIds = context.Skills
+                    .Where(s => !context.CandidateSkills.Any(cs => cs.SkillID == s.SkillID))
+                    .Select(s => s.SkillID)
+                    .ToList();
 
-			return RedirectToAction("Filtering");
+                var orphanedSkills = context.Skills
+                    .Where(s => orphanedSkillIds.Contains(s.SkillID))
+                    .ToList();
+
+                context.Skills.RemoveRange(orphanedSkills);
+                context.SaveChanges();
+            }
+
+            return RedirectToAction("Filtering");
         }
-	}
+
+        [Authorize]
+        public IActionResult Download(int id)
+        {
+            var resume = context.Resumes.FirstOrDefault(r => r.ResumeID == id);
+            if (resume == null || string.IsNullOrEmpty(resume.RESUME_URL))
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                Uri blobUri = new Uri(resume.RESUME_URL);
+                string containerName = blobUri.Segments[1].TrimEnd('/');
+                string blobName = string.Join("", blobUri.Segments.Skip(2));
+                string sasUrl = _blobService.GenerateDownloadSasUri(containerName, blobName, TimeSpan.FromMinutes(15));
+
+                return Redirect(sasUrl);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to generate SAS URL: {ex.Message}");
+                return StatusCode(500, "Failed to generate download link.");
+            }
+        }
+
+    }
 }
