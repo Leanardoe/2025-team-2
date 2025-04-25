@@ -63,7 +63,7 @@ namespace ResumeSystem.Controllers
                     }
 
                     FileUpload fileUpload = new FileUpload(_context);
-                    fileUpload.ResumeUpload(resume.FileName, result.Text, result.ResumeBody, existingCan, blobUrl);
+                    fileUpload.ResumeUpload(blobName, result.Text, result.ResumeBody, existingCan, blobUrl);
 
                     ViewBag.UploadMSG = "Resume processed and skills saved successfully.";
                 }

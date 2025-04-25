@@ -179,9 +179,9 @@ namespace ResumeSystem.Controllers
             {
                 Uri blobUri = new Uri(resume.RESUME_URL);
                 string containerName = blobUri.Segments[1].TrimEnd('/');
-                string blobName = string.Join("", blobUri.Segments.Skip(2));
-                string sasUrl = _blobService.GenerateDownloadSasUri(containerName, blobName, TimeSpan.FromMinutes(15));
+                string blobName = Uri.UnescapeDataString(string.Join("", blobUri.Segments.Skip(2)));
 
+                string sasUrl = _blobService.GenerateDownloadSasUri(containerName, blobName, TimeSpan.FromMinutes(15));
                 return Redirect(sasUrl);
             }
             catch (Exception ex)
@@ -190,6 +190,7 @@ namespace ResumeSystem.Controllers
                 return StatusCode(500, "Failed to generate download link.");
             }
         }
+
 
     }
 }
