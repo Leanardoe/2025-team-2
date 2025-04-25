@@ -138,7 +138,7 @@
             rows.sort((a, b) => {
                 let aVal, bVal;
 
-                if (columnIndex === 4) { // Match % column
+                if (header.textContent.includes('Match')) { // Match % column
                     aVal = parseFloat(a.querySelector('[aria-valuenow]')?.getAttribute('aria-valuenow') || '0');
                     bVal = parseFloat(b.querySelector('[aria-valuenow]')?.getAttribute('aria-valuenow') || '0');
                 } else {
