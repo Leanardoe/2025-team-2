@@ -15,7 +15,6 @@ namespace ResumeSystem.Controllers
         private readonly ResumeContext _context;
         private readonly OpenAIClient _client;
         private readonly string _prompt;
-        private readonly BlobContainerClient _blobContainerClient;
         private readonly BlobService _blobService;
 
         public ResumeController(IConfiguration config, ResumeContext ctx, BlobService blobService)
@@ -24,10 +23,6 @@ namespace ResumeSystem.Controllers
             _client = new OpenAIClient(config["OpenAI:ApiKey"]);
             _prompt = config["AI:Prompt"];
             _blobService = blobService;
-
-            var blobServiceClient = new BlobServiceClient(config["AzureStorage"]);
-            _blobContainerClient = blobServiceClient.GetBlobContainerClient("resumes");
-            _blobContainerClient.CreateIfNotExists(PublicAccessType.Blob);
         }
 
         [HttpGet]
@@ -53,15 +48,8 @@ namespace ResumeSystem.Controllers
 
                 if (result.Correct)
                 {
-                    string blobName = Guid.NewGuid().ToString() + Path.GetExtension(resume.FileName);
-                    BlobClient client = _blobContainerClient.GetBlobClient(blobName);
-
-                    using (var stream = resume.OpenReadStream())
-                    {
-                        await client.UploadAsync(stream, new BlobHttpHeaders { ContentType = resume.ContentType });
-                    }
-
-                    string blobUrl = client.Uri.ToString();
+                    string blobName = await _blobService.UploadResumeAsync(resume, "resumes");
+                    string blobUrl = _blobService.GenerateDownloadSasUri("resumes", blobName, TimeSpan.FromMinutes(10));
 
                     Candidate? existingCan = null;
                     if (!string.IsNullOrWhiteSpace(name))
