@@ -82,7 +82,7 @@ To access the application, enter your credentials, and click the Sign In button 
 
 #### Single Resume Upload
 
-<img src="https://github.com/Leanardoe/2025-team-2/blob/main/ResumeSystem/Screens/image5.png" alt="" width="800px" />
+<img src="https://github.com/Leanardoe/2025-team-2/blob/main/ResumeSystem/Screens/Resume-Single.jpg" alt="" width="800px" />
 
 -  Navigate to the **Resume Upload** section.
 -  Fill in your name and email address.
@@ -90,6 +90,8 @@ To access the application, enter your credentials, and click the Sign In button 
 -  Click **Upload Resume** to submit the file.
 
 #### Mass Resume Upload
+
+<img src="https://github.com/Leanardoe/2025-team-2/blob/main/ResumeSystem/Screens/Resume-Multiple.jpg" alt="" width="800px" />
 
 1. Navigate to the **Mass Upload** section.
 2. Fill in your name and email address.
