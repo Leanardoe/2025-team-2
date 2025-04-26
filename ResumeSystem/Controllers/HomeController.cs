@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace ResumeSystem.Controllers
 {
@@ -9,12 +8,6 @@ namespace ResumeSystem.Controllers
         {
             // Directly go to Uploading page for now
             //return RedirectToAction("Uploading", "Resume");
-            return View();
-        }
-
-        public IActionResult NavPage()
-        {
-            // Placeholder: always allow access
             return View();
         }
     }

@@ -4,16 +4,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models;
 using ResumeSystem.Models.Database;
+using System.Text;
+using Azure.Storage.Blobs;
+using ResumeSystem.Services;
 
 namespace ResumeSystem.Controllers
 {
     public class FilterController : Controller
     {
         private readonly ResumeContext context;
+        private readonly BlobService _blobService;
 
-        public FilterController(ResumeContext ctx)
+        public FilterController(ResumeContext ctx, BlobService blobService)
         {
             context = ctx;
+            _blobService = blobService;
         }
 
         // GET: /Filter
@@ -21,6 +26,7 @@ namespace ResumeSystem.Controllers
 		[Authorize]
 		public async Task<IActionResult> Filtering([FromQuery] string SelectedSkillIDs, [FromQuery] string? SearchTerm)
         {
+            
 			// 0) Populate the skills list
 			var skillIds = new List<int>();
 
@@ -71,7 +77,14 @@ namespace ResumeSystem.Controllers
             var qs = new QuerySearch() { Resumes = resumes };
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
-                List<string> searchKeywords = SearchTerm
+				SearchTerm = SearchTerm.Normalize(NormalizationForm.FormC).Trim();
+
+				// If the last character after trimming is a comma, remove it
+				if (SearchTerm.EndsWith(","))
+				{
+					SearchTerm = SearchTerm.Substring(0, SearchTerm.Length - 1).TrimEnd();
+				}
+				List<string> searchKeywords = SearchTerm
                     .Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(s => s.Trim())
                     .ToList();
@@ -96,34 +109,88 @@ namespace ResumeSystem.Controllers
             return View(vm);
         }
 
-		public IActionResult Delete(int id)
+        [Authorize]
+        public async Task<IActionResult> Delete(int id)
         {
-			var candidate = context.Candidates
-	            .Include(c => c.CandidateSkills)
-	            .FirstOrDefault(c => c.CandidateID == id);
+            // 1. Find the resume to delete
+            var resume = context.Resumes
+                .Include(r => r.Candidate)
+                .FirstOrDefault(r => r.ResumeID == id);
 
-			if (candidate != null)
-			{
-				context.Candidates.Remove(candidate);
-				context.SaveChanges();
+            if (resume != null)
+            {
+                var candidate = resume.Candidate;
 
-				// Get all SkillIDs that are *not* referenced in CandidateSkills anymore
-				var orphanedSkillIds = context.Skills
-					.Where(s => !context.CandidateSkills.Any(cs => cs.SkillID == s.SkillID))
-					.Select(s => s.SkillID)
-					.ToList();
+                // Attempt to delete the blob from Azure Storage
+                try
+                {
+                    Uri blobUri = new Uri(resume.RESUME_URL);
+                    string containerName = blobUri.Segments[1].TrimEnd('/');
+                    string blobName = string.Join("", blobUri.Segments.Skip(2));
 
-				// Remove those skills
-				var orphanedSkills = context.Skills
-					.Where(s => orphanedSkillIds.Contains(s.SkillID))
-					.ToList();
+                    await _blobService.DeleteResumeAsync(containerName, blobName);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to delete blob: {ex.Message}");
+                }
 
-				context.Skills.RemoveRange(orphanedSkills);
+                // 2. Delete the resume
+                context.Resumes.Remove(resume);
+                context.SaveChanges();
 
-				context.SaveChanges();
-			}
+                // 3. Check if the candidate has any resumes left
+                bool hasOtherResumes = context.Resumes.Any(r => r.CandidateID == candidate.CandidateID);
 
-			return RedirectToAction("Filtering");
+                if (!hasOtherResumes)
+                {
+                    // Remove candidate
+                    context.Candidates.Remove(candidate);
+                    context.SaveChanges();
+                }
+
+                // 4. Cleanup orphaned skills
+                var orphanedSkillIds = context.Skills
+                    .Where(s => !context.CandidateSkills.Any(cs => cs.SkillID == s.SkillID))
+                    .Select(s => s.SkillID)
+                    .ToList();
+
+                var orphanedSkills = context.Skills
+                    .Where(s => orphanedSkillIds.Contains(s.SkillID))
+                    .ToList();
+
+                context.Skills.RemoveRange(orphanedSkills);
+                context.SaveChanges();
+            }
+
+            return RedirectToAction("Filtering");
         }
-	}
+
+        [Authorize]
+        public IActionResult Download(int id)
+        {
+            var resume = context.Resumes.FirstOrDefault(r => r.ResumeID == id);
+            if (resume == null || string.IsNullOrEmpty(resume.RESUME_URL))
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                Uri blobUri = new Uri(resume.RESUME_URL);
+                string containerName = blobUri.Segments[1].TrimEnd('/');
+                string blobName = Uri.UnescapeDataString(string.Join("", blobUri.Segments.Skip(2)));
+
+                string sasUrl = _blobService.GenerateDownloadSasUri(containerName, blobName, TimeSpan.FromMinutes(15));
+                return Redirect(sasUrl);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to generate SAS URL: {ex.Message}");
+                return StatusCode(500, "Failed to generate download link.");
+            }
+        }
+
+
+    }
 }

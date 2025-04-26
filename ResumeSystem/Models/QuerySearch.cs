@@ -1,4 +1,5 @@
 ﻿using Ganss.Text;
+using Microsoft.EntityFrameworkCore;
 using ResumeSystem.Models.Database;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -34,7 +35,8 @@ namespace ResumeSystem.Models
 				resume.Match = (dictionary.Count == 0) ? 0 : (int)Math.Floor((dictionary.Count / (double)keywords.Count) * 100.0);
 				newResumes.Add(resume);
 			}
-            return newResumes;
+            //return newResumes;
+			return newResumes.OrderByDescending(r => r.Score).ToList();
 		}
 
         public Dictionary<string,int> ScoreList(IList<WordMatch> resumeslist)

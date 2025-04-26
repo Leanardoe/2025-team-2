@@ -28,13 +28,16 @@ namespace ResumeSystem.Models.Database
 		[NotMapped]
 		public int Match { get; set; } = 100;
 
-        public static string ResumeToString(string filePath)
+		[NotMapped]
+		public int Matches { get; set; }
+
+		public static string ResumeToString(string filePath)
         {
 			//this is easier than I thought it would be
 			try
 			{
 				//file to string
-				return File.ReadAllText(filePath, Encoding.UTF8);
+				return File.ReadAllText(filePath, Encoding.UTF8).Normalize(NormalizationForm.FormC);
 			}
 			catch (Exception ex)
 			{

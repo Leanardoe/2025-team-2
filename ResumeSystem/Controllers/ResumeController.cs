@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using OpenAI;
 using ResumeSystem.Models;
 using ResumeSystem.Models.Database;
+using ResumeSystem.Services;
 
 namespace ResumeSystem.Controllers
 {
@@ -12,12 +15,14 @@ namespace ResumeSystem.Controllers
         private readonly ResumeContext _context;
         private readonly OpenAIClient _client;
         private readonly string _prompt;
+        private readonly BlobService _blobService;
 
-        public ResumeController(IConfiguration config, ResumeContext ctx)
+        public ResumeController(IConfiguration config, ResumeContext ctx, BlobService blobService)
         {
             _context = ctx;
             _client = new OpenAIClient(config["OpenAI:ApiKey"]);
             _prompt = config["AI:Prompt"];
+            _blobService = blobService;
         }
 
         [HttpGet]
@@ -28,8 +33,8 @@ namespace ResumeSystem.Controllers
         }
 
         [HttpPost]
-		[Authorize]
-		public async Task<IActionResult> Uploading(IFormFile resume, string? name, string? email, string? phone)
+        [Authorize]
+        public async Task<IActionResult> Uploading(IFormFile resume, string? name, string? email, string? phone)
         {
             try
             {
@@ -43,36 +48,31 @@ namespace ResumeSystem.Controllers
 
                 if (result.Correct)
                 {
-                    if (name != null)
+                    string blobName = await _blobService.UploadResumeAsync(resume, "resumes");
+                    string blobUrl = _blobService.GenerateDownloadSasUri("resumes", blobName, TimeSpan.FromMinutes(10));
+
+                    Candidate? existingCan = null;
+                    if (!string.IsNullOrWhiteSpace(name))
                     {
-                        Candidate? existingCan = _context.Candidates
-                        .FirstOrDefault(c =>
-                            c.CAN_NAME == name &&
-                            c.CAN_PHONE == phone &&
-                            c.CAN_EMAIL == email);
+                        existingCan = _context.Candidates.FirstOrDefault(c =>
+                            c.CAN_NAME == name && c.CAN_PHONE == phone && c.CAN_EMAIL == email);
                         if (existingCan == null)
                         {
                             existingCan = new Candidate() { CAN_NAME = name, CAN_PHONE = phone, CAN_EMAIL = email };
                         }
-						string fileName = Path.GetFileNameWithoutExtension(resume.FileName);
-						FileUpload fileUpload = new FileUpload(_context);
-						fileUpload.ResumeUpload(fileName, result.Text, result.ResumeBody, existingCan);
-					}
-                    else
-                    {
-						string fileName = Path.GetFileNameWithoutExtension(resume.FileName);
-						FileUpload fileUpload = new FileUpload(_context);
-						fileUpload.ResumeUpload(fileName, result.Text, result.ResumeBody);
-					}
+                    }
 
-                        ViewBag.Message = "Resume processed and skills saved successfully.";
+                    FileUpload fileUpload = new FileUpload(_context);
+                    fileUpload.ResumeUpload(blobName, result.Text, result.ResumeBody, existingCan, blobUrl);
+
+                    ViewBag.UploadMSG = "Resume processed and skills saved successfully.";
                 }
                 else
                 {
                     ViewBag.Error = result.Text;
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
@@ -80,38 +80,63 @@ namespace ResumeSystem.Controllers
             return View();
         }
 
-		[Authorize]
-		public IActionResult MassUploading()
+        [HttpGet]
+        [Authorize]
+        public IActionResult MassUploading()
         {
-            return View();
+            return Redirect(Url.Action("Uploading", "Resume") + "#multiUpload");
         }
 
         [HttpPost]
-		[Authorize]
-		public async Task<IActionResult> MassUploading(List<IFormFile> resumeFiles)
+        [Authorize]
+        public async Task<IActionResult> MassUploading(List<IFormFile> resumes)
         {
-
-            foreach (var resumeFile in resumeFiles)
+            if (resumes == null || !resumes.Any())
             {
-                if (resumeFile == null || resumeFile.Length == 0) continue;
+                TempData["ErrorMSG"] = 2;
+                TempData["MassUploadMSG"] = "Failed to Process Resumes";
+                return Redirect(Url.Action("Uploading", "Resume") + "#multiUpload");
+            }
 
-                var result = await AIProcess.ProcessResumeAsync(resumeFile, _prompt, _client);
+            var tasks = resumes.Select(async resume =>
+            {
+                var result = await AIProcess.ProcessResumeAsync(resume, _prompt, _client);
+                return new { File = resume, Result = result };
+            });
 
-                if (result.Correct)
+            int i = 0;
+            var processed = await Task.WhenAll(tasks);
+            FileUpload fileUpload = new FileUpload(_context);
+
+            // Now you can loop through and use both file and result:
+            foreach (var item in processed)
+            {
+                if (item.Result.Correct)
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(resumeFile.FileName);
-                    FileUpload fileUpload = new FileUpload(_context);
-                    fileUpload.ResumeUpload(fileName, result.Text, result.ResumeBody);
+                    string blobName = await _blobService.UploadResumeAsync(item.File, "resumes");
+                    string blobUrl = _blobService.GenerateDownloadSasUri("resumes", blobName, TimeSpan.FromMinutes(10));
+
+                    fileUpload.ResumeUpload(item.File.FileName, item.Result.Text, item.Result.ResumeBody, null, blobUrl);
+                    i++;
+                }
+                else
+                {
+                    TempData["ErrorMSG"] = 0;
                 }
             }
 
-            ViewBag.Message = "All resumes processed.";
-            return View();
-        }
+            TempData["MassUploadMSG"] = $"Processed {i} Resumes";
+            if (i == 0)
+            {
+                TempData["ErrorMSG"] = 1;
+                TempData["MassUploadMSG"] = "Failed to Process Resumes";
+            }
+            else
+            {
+                TempData["ErrorMSG"] = 0;
+            }
 
-        public IActionResult Filtering()
-        {
-            return View();
+            return Redirect(Url.Action("Uploading", "Resume") + "#multiUpload");
         }
     }
 }
