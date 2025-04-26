@@ -102,6 +102,8 @@ To access the application, enter your credentials, and click the Sign In button 
 
 ### 3. Filtering Resumes
 
+<img src="" alt="" width="800px" />
+
 1. Navigate to the **Resume Filtering** section.
 2. Enter keywords separated by commas in the **Search Keywords** field.
 3. Use the **Filter By** dropdown to refine your search (e.g., most matches).
