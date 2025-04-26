@@ -102,7 +102,7 @@ To access the application, enter your credentials, and click the Sign In button 
 
 ### 3. Filtering Resumes
 
-<img src="" alt="" width="800px" />
+<img src="https://github.com/Leanardoe/2025-team-2/blob/main/ResumeSystem/Screens/Filltering.jpg" alt="" width="800px" />
 
 1. Navigate to the **Resume Filtering** section.
 2. Enter keywords separated by commas in the **Search Keywords** field.
