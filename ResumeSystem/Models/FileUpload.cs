@@ -78,8 +78,7 @@ namespace ResumeSystem.Models
         // ResumeUpload with blob support only
         public void ResumeUpload(string filePath, string AIData, string resumeBody, string blobUrl)
         {
-            var candidate = new Candidate();
-            ResumeUpload(filePath, AIData, resumeBody, candidate, blobUrl);
+            ResumeUpload(blobUrl, AIData, resumeBody);
         }
 
         // ResumeUpload (legacy single file)
