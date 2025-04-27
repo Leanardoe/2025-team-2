@@ -3,7 +3,7 @@
     ViewData["Title"] = "Filter Resumes";
 }
                 <div class="container w-auto mt-5">
-                    <form asp-controller="Filter" asp-action="Filtering" method="get"
+                    <form asp-controller="Filter" asp-action="Filtering" method="get" id="FilterForm"
                     class="row mb-4">
                         <div class="col-md-4">
                             <div class="dropdown">
@@ -82,13 +82,24 @@
                                                 : "bg-danger";
                                             }
                                             <div class="progress position-relative" style="width: 80px; height: 24px;">
-                                                <div class="progress-bar @progressClass" role="progressbar"
-                                                     style="@($"width: {resume.Match}%")"
-                                                     aria-valuenow="@resume.Match" aria-valuemin="0" aria-valuemax="100">
-                                                </div>
-                                                <div class="position-absolute w-100 text-center" style="top: 0; line-height: 24px;">
-                                                    <strong>@($"{resume.Match}%")</strong>
-                                                </div>
+                                                @if (!string.IsNullOrEmpty(Model.SearchTerm)) {
+                                                    <div class="progress-bar @progressClass" role="progressbar"
+                                                         style="@($"width: {resume.Match}%")"
+                                                         aria-valuenow="@resume.Match" aria-valuemin="0" aria-valuemax="100">
+                                                    </div>
+                                                    <div class="position-absolute w-100 text-center" style="top: 0; line-height: 24px;">
+                                                        <strong>@($"{resume.Match}%")</strong>
+                                                    </div>
+                                                }
+                                                else {
+                                                    <div class="progress-bar @progressClass" role="progressbar"
+                                                         style="@($"width: 0%")"
+                                                         aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                    </div>
+                                                    <div class="position-absolute w-100 text-center" style="top: 0; line-height: 24px;">
+                                                        <strong>N/A</strong>
+                                                    </div>
+                                                }
                                             </div>
                                         </td>
                                         <td>@resume.UPLOAD_DATE.ToString()</td>
@@ -113,3 +124,11 @@
                         </table>
                     </div>
                 </div>
+                <script>
+                    document.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter') {
+                            //e.preventDefault(); // optional, to prevent any default behavior
+                            document.getElementById('FilterForm').submit();
+                        }
+                    });
+                </script>
