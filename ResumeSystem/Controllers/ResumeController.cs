@@ -121,7 +121,7 @@ namespace ResumeSystem.Controllers
                     string blobName = await _blobService.UploadResumeAsync(item.File, "resumes");
                     string blobUrl = _blobService.GenerateDownloadSasUri("resumes", blobName, TimeSpan.FromMinutes(10));
 
-                    fileUpload.ResumeUpload(item.File.FileName, item.Result.Text, item.Result.ResumeBody, null, blobUrl);
+                    fileUpload.ResumeUpload(item.File.FileName, item.Result.Text, item.Result.ResumeBody, blobUrl);
                     i++;
                 }
                 else
