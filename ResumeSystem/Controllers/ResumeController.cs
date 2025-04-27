@@ -51,19 +51,24 @@ namespace ResumeSystem.Controllers
                     string blobName = await _blobService.UploadResumeAsync(resume, "resumes");
                     string blobUrl = _blobService.GenerateDownloadSasUri("resumes", blobName, TimeSpan.FromMinutes(10));
 
-                    Candidate? existingCan = null;
+                    
                     if (!string.IsNullOrWhiteSpace(name))
                     {
-                        existingCan = _context.Candidates.FirstOrDefault(c =>
+						Candidate? existingCan = null;
+						existingCan = _context.Candidates.FirstOrDefault(c =>
                             c.CAN_NAME == name && c.CAN_PHONE == phone && c.CAN_EMAIL == email);
                         if (existingCan == null)
                         {
                             existingCan = new Candidate() { CAN_NAME = name, CAN_PHONE = phone, CAN_EMAIL = email };
                         }
-                    }
-
-                    FileUpload fileUpload = new FileUpload(_context);
-                    fileUpload.ResumeUpload(blobName, result.Text, result.ResumeBody, existingCan, blobUrl);
+						FileUpload fileUpload = new FileUpload(_context);
+						fileUpload.ResumeUpload(blobName, result.Text, result.ResumeBody, existingCan, blobUrl);
+					}
+                    else
+                    {
+						FileUpload fileUpload = new FileUpload(_context);
+						fileUpload.ResumeUpload(blobName, result.Text, result.ResumeBody, blobUrl);
+					}
 
                     ViewBag.UploadMSG = "Resume processed and skills saved successfully.";
                 }
