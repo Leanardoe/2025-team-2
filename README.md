@@ -56,47 +56,46 @@ Ensure your App Service has:
 
 ---
 
-# Secure Resume Filtering System - How To Use
+##   Secure Resume Filtering System - How To Use
 
 ### A secure, automated tool for recruiters to efficiently filter and rank internship candidates based on resume content matching predefined criteria.
 
 ---
 
-## How to Use the App
+##  How to Use the App
 
-### 1. Signing In
+## 1. Signing In
 
 When first entering the application, you will be prompted with the following screen:
 
 <img src="https://github.com/Leanardoe/2025-team-2/blob/main/ResumeSystem/Screens/SignIn.jpg" alt="Sign-In Screen" width="800px" />
 
-After pressing the "Sign In" button, You will be presented with the following page:
+After pressing the "Sign In" button, you will be presented with the following page:
 
 <img src="https://github.com/Leanardoe/2025-team-2/blob/main/ResumeSystem/Screens/Signin-2.jpg" alt="Sign-In Screen" width="800px" />
 
-To access the application, enter your credentials, and click the Sign In button to log in securely.
+To access the application, enter your credentials and click the Sign In button to log in securely.
 
 ---
 
-### 2. Uploading Resumes
+## 2. Uploading Resumes
 
-#### Single Resume Upload
+### Single Resume Upload
 
 <img src="https://github.com/Leanardoe/2025-team-2/blob/main/ResumeSystem/Screens/Resume-Single.jpg" alt="" width="800px" />
 
 -  Navigate to the **Resume Upload** section.
--  Fill in your name and email address.
+-  Fill in your name and email address (optional).
 -  Click **Choose File** to select a resume file (supported formats: PDF, DOCX, TXT).
 -  Click **Upload Resume** to submit the file.
 
-#### Mass Resume Upload
+### Mass Resume Upload
 
 <img src="https://github.com/Leanardoe/2025-team-2/blob/main/ResumeSystem/Screens/Resume-Multiple.jpg" alt="" width="800px" />
 
-1. Navigate to the **Mass Upload** section.
-2. Fill in your name and email address.
-3. Click **Choose Files** to select multiple resume files.
-4. Click **Upload Resumes** to process all selected files.
+-   Navigate to the **Mass Upload** section.
+-   Click **Choose Files** to select multiple resume files.
+-   Click **Upload Resumes** to process all selected files.
 
 ---
 
@@ -104,7 +103,7 @@ To access the application, enter your credentials, and click the Sign In button 
 
 <img src="https://github.com/Leanardoe/2025-team-2/blob/main/ResumeSystem/Screens/Filltering.jpg" alt="" width="800px" />
 
-1. Navigate to the **Resume Filtering** section.
-2. Enter keywords separated by commas in the **Search Keywords** field.
-3. Use the **Filter By** dropdown to refine your search (e.g., most matches).
-4. Click **Search** to view candidates that match your criteria.
+-   Navigate to the **Resume Filtering** section.
+-   Enter keywords separated by commas in the **Search Keywords** field.
+-   Use the **Filter By** dropdown to refine your search (e.g., most matches).
+-   Click **Search** to view candidates that match your criteria.
