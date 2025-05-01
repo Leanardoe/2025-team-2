@@ -142,8 +142,12 @@ namespace ResumeSystem.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogInformation($"Failed to delete blob: {ex.Message}");
+                    var errorMessage = $"Failed to delete blob: {ex.Message}";
+                    TempData["DeletionError"] = errorMessage;
+                    _logger.LogError(ex, errorMessage);
+                    ViewBag.DeletionError = errorMessage;
                 }
+
 
                 // 2. Delete the resume
                 context.Resumes.Remove(resume);
