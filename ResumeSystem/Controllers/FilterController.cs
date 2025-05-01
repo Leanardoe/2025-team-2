@@ -7,6 +7,7 @@ using ResumeSystem.Models.Database;
 using System.Text;
 using Azure.Storage.Blobs;
 using ResumeSystem.Services;
+using Microsoft.Extensions.Logging;
 
 namespace ResumeSystem.Controllers
 {
@@ -14,11 +15,15 @@ namespace ResumeSystem.Controllers
     {
         private readonly ResumeContext context;
         private readonly BlobService _blobService;
+        private readonly ILogger<FilterController> _logger;
 
-        public FilterController(ResumeContext ctx, BlobService blobService)
+
+        public FilterController(ResumeContext ctx, BlobService blobService, ILogger<FilterController> logger)
         {
             context = ctx;
             _blobService = blobService;
+            _logger = logger;
+
         }
 
         // GET: /Filter
@@ -117,11 +122,12 @@ namespace ResumeSystem.Controllers
                 .Include(r => r.Candidate)
                 .FirstOrDefault(r => r.ResumeID == id);
 
-            Console.WriteLine("### Beginning delete");
+            _logger.LogInformation("### Beginning delete");
 
             if (resume != null)
             {
-                Console.WriteLine("### Not null");
+                _logger.LogInformation("### Not null");
+
                 var candidate = resume.Candidate;
 
                 // Attempt to delete the blob from Azure Storage
@@ -130,13 +136,13 @@ namespace ResumeSystem.Controllers
                     Uri blobUri = new Uri(resume.RESUME_URL);
                     string containerName = blobUri.Segments[1].TrimEnd('/');
                     string blobName = string.Join("", blobUri.Segments.Skip(2));
-                    Console.WriteLine("### calling function");
+                    _logger.LogInformation("### calling function");
                     await _blobService.DeleteResumeAsync(containerName, blobName);
-                    Console.WriteLine("### function called");
+                    _logger.LogInformation("### function called");
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to delete blob: {ex.Message}");
+                    _logger.LogInformation($"Failed to delete blob: {ex.Message}");
                 }
 
                 // 2. Delete the resume
