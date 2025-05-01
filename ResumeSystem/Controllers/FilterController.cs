@@ -117,8 +117,11 @@ namespace ResumeSystem.Controllers
                 .Include(r => r.Candidate)
                 .FirstOrDefault(r => r.ResumeID == id);
 
+            Console.WriteLine("### Beginning delete");
+
             if (resume != null)
             {
+                Console.WriteLine("### Not null");
                 var candidate = resume.Candidate;
 
                 // Attempt to delete the blob from Azure Storage
@@ -127,8 +130,9 @@ namespace ResumeSystem.Controllers
                     Uri blobUri = new Uri(resume.RESUME_URL);
                     string containerName = blobUri.Segments[1].TrimEnd('/');
                     string blobName = string.Join("", blobUri.Segments.Skip(2));
-
+                    Console.WriteLine("### calling function");
                     await _blobService.DeleteResumeAsync(containerName, blobName);
+                    Console.WriteLine("### function called");
                 }
                 catch (Exception ex)
                 {
